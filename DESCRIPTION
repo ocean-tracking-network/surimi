@@ -2,13 +2,18 @@ Package: surimi
 Title: Convert Acoustic Telemetry Data Between Institutional Formats
 Version: 0.0.0.1
 Authors@R: 
-    person("Bruce", "Delo", , "br772481@dal.ca")
+    person("Bruce", "Delo", email = "br772481@dal.ca",
+    role = c('aut', 'cre'))
 Description: Surimi takes as input data files representing acoustic telemetry, which
   may have column names and structures specific to particular institutions. It can
   convert, with minimal code on the user's part, data from one format to another, 
   allowing data from one institution to be easily used across software packages
   that may expect different formats. 
-License: `use_gpl3_license()`
+License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.3
+Imports: 
+    dplyr,
+    lubridate,
+    tidyr
