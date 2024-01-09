@@ -190,7 +190,11 @@ imos_otn_column_map <- function(det_dataframe,
       # )
       
   }
+  
+  return(list("detections" = det_return, "receivers" = rcvr_return, "tags" = tag_return))
 }
+
+
 
 #use  receiver_status = lost as 'lost', damaged as 'failed', 
 #returned to vendor as 'failed' with comment 'returned to vendor'
