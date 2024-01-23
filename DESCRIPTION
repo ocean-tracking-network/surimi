@@ -4,7 +4,7 @@ Version: 0.0.0.1
 Authors@R: 
     c(person(given="Bruce", 
           family="Delo",
-          role=c("aut"),
+          role=c("aut", "ctb"),
           email="br772481@dal.ca"))
 Description: Surimi takes as input data files representing acoustic telemetry, which
   may have column names and structures specific to particular institutions. It can
