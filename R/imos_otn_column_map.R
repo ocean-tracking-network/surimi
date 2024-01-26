@@ -198,6 +198,7 @@ imos_otn_column_map <- function(det_dataframe,
 
 #use  receiver_status = lost as 'lost', damaged as 'failed', 
 #returned to vendor as 'failed' with comment 'returned to vendor'
-map_receiver_status <- function(status) {
+#Institution determines the original source of the data and its destination, and thereby what the mapping is.
+map_receiver_status <- function(status, src_institution, dest_institution) {
   
 }
