@@ -21,7 +21,6 @@
 ##'
 otn_imos_column_map <- function(det_dataframe, rcvr_dataframe = NULL, tag_dataframe = NULL, derive = TRUE) {
   
-
   #We need to ultimately produce the following:
   # - A detections dataframe with columns appropriate to the IMOS spec. 
   # - A receiver dataframe with appropriate columns, if necessary with data derived from the detections dataframe.
@@ -41,6 +40,11 @@ otn_imos_column_map <- function(det_dataframe, rcvr_dataframe = NULL, tag_datafr
   #Quit instantly if there is no detections dataframe. This is unlikely since this check already happens in the function above, but for completeness'
   #sake we'll include it. 
   if(is.null(det_dataframe)) stop("\033[31;1mCan not run otn -> imos conversion without a detections file!\033[0m\n")
+  
+  if(!is.data.frame(det_dataframe)) {
+    #TODO- parquet as well.
+    det_dataframe <- read.csv(det_dataframe)
+  }
   
   #If we don't get passed a receiver or tag dataframe, we derive them from det. This will give us hopefully enough info that we can create the final
   #detection dataframe to be returned, which will be valid for Remora. Ideally. 
@@ -91,6 +95,7 @@ otn_imos_column_map <- function(det_dataframe, rcvr_dataframe = NULL, tag_datafr
       transmitter_sensor_unit = NA,
       transmitter_status = NA,
       transmitter_estimated_battery_life = NA,
+      transmitter_sensor_raw_value = NA,
       embargo_date = NA,
       transmitter_deployment_latitude = NA,
       transmitter_deployment_longitude = NA,
