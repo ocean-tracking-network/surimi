@@ -47,7 +47,8 @@ imos_otn_column_map <- function(det_dataframe,
       transmitter_id,
       transmitter_sensor_raw_value,
       transmitter_sensor_unit,
-      station_name
+      station_name,
+      receiver_id
     ) %>%
     mutate(
       # cleandate = ymd(as_date(detection_datetime)),

@@ -351,7 +351,8 @@ derive_rcvr_from_det <- function(det_dataframe) {
       latitude,
       receiver_group,
       minDetectionDate,
-      maxDetectionDate
+      maxDetectionDate,
+      collectioncode,
     ) %>%
     unite(
       receiver_deployment_id, c("receiver_group", "station", "receiver"),
@@ -364,12 +365,12 @@ derive_rcvr_from_det <- function(det_dataframe) {
       receiver_name = receiver,
       depth_below_surface = receiver_depth,
       receiver_deployment_longitude = longitude,
-      receiver_deployment_latitude = latitude
+      receiver_deployment_latitude = latitude,
+      receiver_project_name = collectioncode
     ) %>%
     mutate(
       # Add NA-filled columns for anything that can't be derived.
       purchasing_organisation = NA,
-      receiver_project_name = NA,
       receiver_status = NA,
       receiver_deployment_datetime = NA,
       receiver_recovery_datetime = NA,
@@ -425,17 +426,18 @@ derive_tag_from_det <- function(det_dataframe) {
       daycollected,
       longitude,
       latitude,
-      catalognumber
+      catalognumber,
+      collectioncode,
     ) %>%
     rename(
       transmitter_id = tagname,
       species_common_name = commonname,
       species_scientific_name = scientificname,
-      transmitter_deployment_id = catalognumber
+      transmitter_deployment_id = catalognumber,
+      tagging_project_name = collectioncode
     ) %>%
     mutate(
       transmitter_serial_number = NA,
-      tagging_project_name = NA,
       transmitter_type = NA,
       transmitter_sensor_type = NA,
       transmitter_sensor_slope = NA,
