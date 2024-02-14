@@ -88,7 +88,7 @@ otn_imos_column_map <- function(det_dataframe, rcvr_dataframe = NULL, tag_datafr
       WORMS_species_aphia_id = sapply(det_dataframe$scientificname, USE.NAMES = FALSE, FUN = get_aphiaid_from_lookup, lookup = lookup),
       animal_sex = NA,
       receiver_name = NA,
-      receiver_project_name = NA,
+      receiver_project_name = receiver_group,
       transmitter_serial_number = NA,
       transmitter_type = NA,
       transmitter_sensor_type = NA,
@@ -365,6 +365,7 @@ derive_rcvr_from_det <- function(det_dataframe) {
       installation_name = detectedby,
       station_name = station,
       receiver_name = receiver,
+      receiver_project_name = receiver_group,
       depth_below_surface = receiver_depth,
       receiver_deployment_longitude = longitude,
       receiver_deployment_latitude = latitude
@@ -372,7 +373,6 @@ derive_rcvr_from_det <- function(det_dataframe) {
     mutate(
       # Add NA-filled columns for anything that can't be derived.
       purchasing_organisation = NA,
-      receiver_project_name = NA,
       receiver_status = NA,
       receiver_deployment_datetime = NA,
       receiver_recovery_datetime = NA,
