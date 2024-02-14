@@ -14,7 +14,7 @@
 ##' @param coll_code The user-supplied collectioncode, which we'll use to populate the receiver_project_name and tagging_project_name
 ##' columns in the receiver and tag metadata files respectively. We don't have a good way to associate the relevant info from the det
 ##' extract to the appropriate columns in the rcvr/tag metadata, but those datasets are restricted to one collectioncode each, so
-##' we can just take it from the user at the time they run the code. 
+##' we can just take it from the user at the time they run the code.
 ##'
 ##' @importFrom dplyr select '%>%' mutate rename group_by arrange distinct filter left_join
 ##' @importFrom tidyr unite
