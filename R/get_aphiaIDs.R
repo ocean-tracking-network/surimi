@@ -13,21 +13,21 @@
 ##' @return Returns a named list with the scientific name as the key and the aphiaID as the value. 
 ##'
 
-#get a table of unique scientific names and aphiaIDs. 
+# get a table of unique scientific names and aphiaIDs.
 get_unique_aphiaids <- function(scinames) {
-  #Get the unique names.
+  # Get the unique names.
   unique_names <- unique(scinames)
-  
-  #Create an empty list to hold our name/value pairs.
+
+  # Create an empty list to hold our name/value pairs.
   aphia_ids <- list()
-  
-  #Build the dict
+
+  # Build the dict
   for (name in unique_names) {
-    #wm_name2id is a worrms function for associating a scientific name with its Aphia ID.
+    # wm_name2id is a worrms function for associating a scientific name with its Aphia ID.
     aphia_ids[[name]] <- worrms::wm_name2id(name)
   }
-  
-  #return the table. 
+
+  # return the table.
   return(aphia_ids)
 }
 
@@ -43,9 +43,9 @@ get_unique_aphiaids <- function(scinames) {
 ##' 
 
 get_aphiaid_from_lookup <- function(sciname, lookup) {
-  #Get the aphiaID from the lookup table.
+  # Get the aphiaID from the lookup table.
   aphiaid <- lookup[[sciname]]
-  #Strip off the 'named' part (this is what isn't working)
-  #aphiaid <- as.character(unname(aphiaid))
+  # Strip off the 'named' part (this is what isn't working)
+  # aphiaid <- as.character(unname(aphiaid))
   return(aphiaid)
 }
