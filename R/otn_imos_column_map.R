@@ -242,7 +242,7 @@ otn_imos_column_map <- function(det_dataframe, rcvr_dataframe = NULL, tag_datafr
         embargo_date = NA,
         transmitter_recovery_latitude = NA,
         transmitter_recovery_longitude = NA,
-        tagging_project_name = NA,
+        tagging_project_name = coll_code,
       ) %>%
       unite(
         transmitter_id, c("TAG_CODE_SPACE", "TAG_ID_CODE"),
@@ -424,6 +424,7 @@ derive_tag_from_det <- function(det_dataframe) {
   message(nrow(releases))
   tag <- distinctTag %>%
     select(
+      collectioncode,
       tagname,
       commonname,
       scientificname,
@@ -438,11 +439,11 @@ derive_tag_from_det <- function(det_dataframe) {
       transmitter_id = tagname,
       species_common_name = commonname,
       species_scientific_name = scientificname,
-      transmitter_deployment_id = catalognumber
+      transmitter_deployment_id = catalognumber,
+      tagging_project_name = collectioncode
     ) %>%
     mutate(
       transmitter_serial_number = NA,
-      tagging_project_name = NA,
       transmitter_type = NA,
       transmitter_sensor_type = NA,
       transmitter_sensor_slope = NA,
