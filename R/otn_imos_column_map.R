@@ -11,6 +11,10 @@
 ##' extract dataframe to generate dataframes for either or both of the receiver and tag dataframes, if they are not passed in. Although
 ##' this will result in missing information, it does let the user supply only a detection extract file, which is a situation some may
 ##' find themselves in.
+##' @param coll_code The user-supplied collectioncode, which we'll use to populate the receiver_project_name and tagging_project_name
+##' columns in the receiver and tag metadata files respectively. We don't have a good way to associate the relevant info from the det
+##' extract to the appropriate columns in the rcvr/tag metadata, but those datasets are restricted to one collectioncode each, so
+##' we can just take it from the user at the time they run the code. 
 ##'
 ##' @importFrom dplyr select '%>%' mutate rename group_by arrange distinct filter left_join
 ##' @importFrom tidyr unite
@@ -19,7 +23,7 @@
 ##' @return Returns a list containing three approximately IMOS-formatted dataframes.
 ##' @export
 ##'
-otn_imos_column_map <- function(det_dataframe, rcvr_dataframe = NULL, tag_dataframe = NULL, derive = TRUE) {
+otn_imos_column_map <- function(det_dataframe, rcvr_dataframe = NULL, tag_dataframe = NULL, derive = TRUE, coll_code = NULL) {
   # We need to ultimately produce the following:
   # - A detections dataframe with columns appropriate to the IMOS spec.
   # - A receiver dataframe with appropriate columns, if necessary with data derived from the detections dataframe.
@@ -181,7 +185,7 @@ otn_imos_column_map <- function(det_dataframe, rcvr_dataframe = NULL, tag_datafr
       ) %>%
       mutate(
         purchasing_organization = NA,
-        receiver_project_name = NA,
+        receiver_project_name = coll_code,
       )
   }
 
