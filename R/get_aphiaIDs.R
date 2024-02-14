@@ -1,7 +1,17 @@
-#We can use the worrms library to get aphiaIDs, but since we could be dealing with very large datasets, we don't want to query the worms DB as part of the mutate/column mapping process, since we'd be doing a query for
-#every row and therefore doing a lot of duplicate work and slowing down the code (I tried this- setting the 'WORMS_species_aphia_id' column equal to an lapply of wm_name2id on the scientific name column- and even on a dataset
-#of only a few hundred rows, it bloated the time quite badly.) What we're going to do instead is collect and pre-query aphiaIDs for only the unique scientific names, for which we'll create a lookup table that we can then
-#use to build out the column a little more quickly.
+##' @title Get AphiaIDs for scientific names
+##'
+##' @description Takes a column of scientific names and creates a lookup table (read: named list) of the unique scientific names
+##' against their aphia IDs. We can use worrms to query the WORMS REST service for the aphiaIDs, but doing it for every row is
+##' time intensive in a way we don't want. This way, we can create the lookup client-side and then do all the querying only as
+##' we need to.
+##'
+##' @param scinames A vector (dataframe column) containing the list of scientific names from a detection extract dataframe in
+##' Surimi. 
+##'
+##' @importFrom worrms wm_name2id
+##'
+##' @return Returns a named list with the scientific name as the key and the aphiaID as the value. 
+##'
 
 #get a table of unique scientific names and aphiaIDs. 
 get_unique_aphiaids <- function(scinames) {
@@ -20,6 +30,17 @@ get_unique_aphiaids <- function(scinames) {
   #return the table. 
   return(aphia_ids)
 }
+
+
+##' @title Consult a lookup table for the aphiaID.
+##'
+##' @description This is the helper function that we use in the sapply when mutating the WORMS_species_aphia_id into existence. 
+##'
+##' @param sciname A Scientific name as a string.
+##' @param lookup The named list containing key-value pairs of scientific names and aphiaIDs. 
+##'
+##' @return Returns the appropriate aphiaID corresponding to the sciname. 
+##' 
 
 get_aphiaid_from_lookup <- function(sciname, lookup) {
   #Get the aphiaID from the lookup table.
