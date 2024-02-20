@@ -421,7 +421,8 @@ derive_tag_from_det <- function(det_dataframe) {
       transmitter_deployment_id = catalognumber,
       transmitter_deployment_latitude = latitude,
       transmitter_deployment_longitude = longitude,
-      transmitter_deployment_datetime = datecollected
+      transmitter_deployment_datetime = datecollected,
+      transmitter_deployment_locality = station
     )
   message("Number of releases:")
   message(nrow(releases))
@@ -457,7 +458,6 @@ derive_tag_from_det <- function(det_dataframe) {
       # transmitter_deployment_id = NA,
       animal_sex = NA,
       placement = NA,
-      transmitter_deployment_locality = NA,
       transmitter_deployment_comments = NA,
       embargo_date = NA,
       transmitter_recovery_datetime = NA,
@@ -472,7 +472,8 @@ derive_tag_from_det <- function(det_dataframe) {
       transmitter_deployment_id,
       transmitter_deployment_latitude,
       transmitter_deployment_longitude,
-      transmitter_deployment_datetime
+      transmitter_deployment_datetime,
+      transmitter_deployment_locality
     ),
     by = "transmitter_deployment_id"
   )
