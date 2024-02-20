@@ -288,9 +288,9 @@ otn_imos_column_map <- function(det_dataframe, rcvr_dataframe = NULL, tag_datafr
 ##' @keywords internal
 ##'
 derive_rcvr_from_det <- function(det_dataframe) {
-  #To start, we will filter the releases out of our detections dataframe.
+  # To start, we will filter the releases out of our detections dataframe.
   no_releases <- det_dataframe %>% filter(receiver != "release")
-  
+
   # The first thing we need to do is gin up some inferred min and max deployment dates.
   # We'll use the following code to do so.
   rcvr_grouped <- NULL
