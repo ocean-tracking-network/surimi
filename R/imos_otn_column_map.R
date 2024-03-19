@@ -43,7 +43,7 @@ imos_otn_column_map <- function(det_dataframe,
   det_return <- det_dataframe %>%
     dplyr::select(
       detection_datetime,
-      receiver_name,
+      receiver_id,
       transmitter_id,
       transmitter_sensor_raw_value,
       transmitter_sensor_unit,
