@@ -46,7 +46,7 @@ imos_to_otn_receivers <- function(rcvr_dataframe) {
     ) %>%
     separate(
       col = receiver_name,
-      into = c("INS_MODEL_NUMBER", "INS_SERIAL_NUMBER", sep="-")
+      into = c("INS_MODEL_NUMBER", "INS_SERIAL_NUMBER", sep = "-")
     )
 
   # Have to do a little extra manipulation on the dataframe to give "RECOVERED"
