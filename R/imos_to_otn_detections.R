@@ -19,7 +19,7 @@ imos_to_otn_detections <- function(detection_dataframe) {
      receiver_name,
      receiver_id,
      transmitter_id,
-     transmitter_sensor_raw_value,
+     transmitter_sensor_value,
      transmitter_sensor_unit,
      station_name,
      receiver_deployment_latitude,
@@ -30,10 +30,10 @@ imos_to_otn_detections <- function(detection_dataframe) {
      transmitter_serial = NA, 
    ) %>%
    rename(
-     date_ane_time = detection_datetime,
+     date_and_time = detection_datetime,
      receiver = receiver_name,
      transmitter = transmitter_id,
-     sensor_value = transmitter_sensor_raw_value,
+     sensor_value = transmitter_sensor_value,
      sensor_unit = transmitter_sensor_unit,
      latitude = receiver_deployment_latitude,
      longitude = receiver_deployment_longitude
