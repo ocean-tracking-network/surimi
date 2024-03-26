@@ -13,31 +13,31 @@
 #'
 
 imos_to_otn_detections <- function(detection_dataframe) {
- det_return <- detection_dataframe %>%
-   dplyr::select(
-     detection_datetime,
-     receiver_name,
-     receiver_id,
-     transmitter_id,
-     transmitter_sensor_value,
-     transmitter_sensor_unit,
-     station_name,
-     receiver_deployment_latitude,
-     receiver_deployment_longitude
-   ) %>%
-   mutate(
-     transmitter_name = NA,
-     transmitter_serial = NA, 
-   ) %>%
-   rename(
-     date_and_time = detection_datetime,
-     receiver = receiver_name,
-     transmitter = transmitter_id,
-     sensor_value = transmitter_sensor_value,
-     sensor_unit = transmitter_sensor_unit,
-     latitude = receiver_deployment_latitude,
-     longitude = receiver_deployment_longitude
-   )
-   
- return(det_return)
+  det_return <- detection_dataframe %>%
+    dplyr::select(
+      detection_datetime,
+      receiver_name,
+      receiver_id,
+      transmitter_id,
+      transmitter_sensor_value,
+      transmitter_sensor_unit,
+      station_name,
+      receiver_deployment_latitude,
+      receiver_deployment_longitude
+    ) %>%
+    mutate(
+      transmitter_name = NA,
+      transmitter_serial = NA,
+    ) %>%
+    rename(
+      date_and_time = detection_datetime,
+      receiver = receiver_name,
+      transmitter = transmitter_id,
+      sensor_value = transmitter_sensor_value,
+      sensor_unit = transmitter_sensor_unit,
+      latitude = receiver_deployment_latitude,
+      longitude = receiver_deployment_longitude
+    )
+
+  return(det_return)
 }
