@@ -15,6 +15,8 @@
 ##' columns in the receiver and tag metadata files respectively. We don't have a good way to associate the relevant info from the det
 ##' extract to the appropriate columns in the rcvr/tag metadata, but those datasets are restricted to one collectioncode each, so
 ##' we can just take it from the user at the time they run the code.
+##' @param tagname_column The name of the column that's equivalent to 'tagname', if the tagname column isn't present. Should only be
+##' necessary if deriving. 
 ##'
 ##' @importFrom dplyr select '%>%' mutate rename group_by arrange distinct filter left_join
 ##' @importFrom tidyr unite
@@ -23,7 +25,7 @@
 ##' @return Returns a list containing three approximately IMOS-formatted dataframes.
 ##' @export
 ##'
-otn_imos_column_map <- function(det_dataframe, rcvr_dataframe = NULL, tag_dataframe = NULL, derive = TRUE, coll_code = NULL) {
+otn_imos_column_map <- function(det_dataframe, rcvr_dataframe = NULL, tag_dataframe = NULL, derive = TRUE, coll_code = NULL, tagname_column = 'tagname') {
   # We need to ultimately produce the following:
   # - A detections dataframe with columns appropriate to the IMOS spec.
   # - A receiver dataframe with appropriate columns, if necessary with data derived from the detections dataframe.
@@ -58,7 +60,7 @@ otn_imos_column_map <- function(det_dataframe, rcvr_dataframe = NULL, tag_datafr
 
   if (is.null(tag_dataframe) && derive) {
     message("Deriving tag dataframe...")
-    tag_return <- derive_tag_from_det(det_dataframe)
+    tag_return <- derive_tag_from_det(det_dataframe, tagname_column)
   }
 
   # Construct a little lookup table for the aphiaIDs. This keeps us from having to query the WORMS database over and over again (for example, the data I tested on had 300 entries for 'blue shark')- lot of redundant querying there.
@@ -91,7 +93,7 @@ otn_imos_column_map <- function(det_dataframe, rcvr_dataframe = NULL, tag_datafr
       CAAB_species_id = NA,
       WORMS_species_aphia_id = sapply(det_dataframe$scientificname, USE.NAMES = FALSE, FUN = get_aphiaid_from_lookup, lookup = lookup),
       animal_sex = NA,
-      receiver_name = NA,
+      #receiver_name = NA,
       receiver_project_name = receiver_group,
       transmitter_serial_number = NA,
       transmitter_type = NA,
@@ -400,17 +402,21 @@ derive_rcvr_from_det <- function(det_dataframe) {
 ##' @param det_dataframe The dataframe containing detection information.
 ##' Most likely a detection extract.
 ##'
+##' @param tagname_column The name of the column equivalent to 'tagname', if tagname isn't present. This
+##' is getting passed in from the above function, but it's here too as a fallback in case the function gets used on its own.
+##' 
 ##' @importFrom dplyr select '%>%' mutate rename group_by arrange distinct filter
 ##' @importFrom dplyr left_join
 ##' @importFrom tidyr unite
 ##'
 ##' @keywords internal
 ##'
-derive_tag_from_det <- function(det_dataframe) {
+derive_tag_from_det <- function(det_dataframe, tagname_column = 'tagname') {
   # Group by tagname. We may need to add the option to use alternative columns in the future, but that's doable, I think.
+  #tagname_column <- as.name(tagname_column)
   distinctTag <- det_dataframe %>%
-    group_by(tagname) %>%
-    distinct(tagname, .keep_all = TRUE)
+    group_by_at(tagname_column) %>%
+    distinct_at(tagname_column, .keep_all = TRUE)
 
   # To get the correct transmitter lat/lon, we need to get the releases.
   releases <- det_dataframe %>%
