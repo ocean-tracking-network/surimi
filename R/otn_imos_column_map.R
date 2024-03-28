@@ -128,7 +128,7 @@ otn_imos_column_map <- function(det_dataframe, rcvr_dataframe = NULL, tag_datafr
       installation_name = receiver_group,
       station_name = station,
       receiver_id = receiver,
-      #receiver_name = receiver, # Could be not the right thing to do to have both this and receiver_id be receiver?
+      # receiver_name = receiver, # Could be not the right thing to do to have both this and receiver_id be receiver?
       receiver_deployment_longitude = longitude,
       receiver_deployment_latitude = latitude # counterintuitively, we rename these here even though they get renamed BACK to their originals
       # back outside this function. The code outside still has to work for IMOS formatted data so we can't change it too much, so when we massage
