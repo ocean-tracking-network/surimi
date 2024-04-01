@@ -94,7 +94,7 @@ otn_imos_column_map <- function(det_dataframe, rcvr_dataframe = NULL, tag_datafr
       WORMS_species_aphia_id = sapply(det_dataframe$scientificname, USE.NAMES = FALSE, FUN = get_aphiaid_from_lookup, lookup = lookup),
       animal_sex = NA,
       receiver_name = receiver,
-      receiver_project_name = receiver_group,
+      receiver_project_name = detectedby,
       transmitter_serial_number = NA,
       transmitter_type = NA,
       transmitter_sensor_type = NA,

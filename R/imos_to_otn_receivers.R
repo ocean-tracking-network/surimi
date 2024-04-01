@@ -34,7 +34,11 @@ imos_to_otn_receivers <- function(rcvr_dataframe) {
       AR_SERIAL_NO = NA,
       DATA_DOWNLOADED = NA,
       DOWNLOAD_DATE_TIME = NA,
-      COMMENTS = NA
+      COMMENTS = NA,
+      TRANSMITTER = NA,
+      TRANSMITTER_MODEL = NA,
+      DEPLOYED_BY = NA,
+      FILENAME = NA
     ) %>%
     rename(
       OTN_ARRAY = receiver_project_name,
