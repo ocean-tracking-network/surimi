@@ -147,7 +147,7 @@ imos_to_otn_tags <- function(tag_dataframe, animal_measurements_dataframe) {
       `WEIGHT (kg)` = WEIGHT
     )
 
-  #Gotta do the same sleight of hand here for utc_release_date_time as in receivers.
+  # Gotta do the same sleight of hand here for utc_release_date_time as in receivers.
   tag_return <- tag_return %>%
     mutate(
       across(ends_with("_DATE_TIME"), lubridate::ymd_hms)
@@ -158,6 +158,6 @@ imos_to_otn_tags <- function(tag_dataframe, animal_measurements_dataframe) {
     mutate(
       across(ends_with("_DATE_TIME"), ~ stringr::str_replace(.x, " ", "T"))
     )
-  
+
   return(tag_return)
 }
