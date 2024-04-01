@@ -22,14 +22,16 @@ imos_to_otn_receivers <- function(rcvr_dataframe) {
       depth_below_surface,
       receiver_name,
       receiver_status,
-      receiver_recovery_datetime
+      receiver_recovery_datetime,
+      receiver_recovery_latitude,
+      receiver_recovery_longitude
     ) %>%
     mutate(
       BOTTOM_DEPTH = NA,
       RISER_LENGTH = NA,
       CODE_SET = NA,
-      AR_MODEL_NUMBER = NA,
-      AR_SERIAL_NUMBER = NA,
+      AR_MODEL_NO = NA,
+      AR_SERIAL_NO = NA,
       DATA_DOWNLOADED = NA,
       DOWNLOAD_DATE_TIME = NA,
       COMMENTS = NA
@@ -42,11 +44,14 @@ imos_to_otn_receivers <- function(rcvr_dataframe) {
       DEPLOY_LONG = receiver_deployment_longitude,
       INSTRUMENT_DEPTH = depth_below_surface,
       RECOVERED = receiver_status,
-      RECOVER_DATE_TIME = receiver_recovery_datetime
+      RECOVER_DATE_TIME = receiver_recovery_datetime,
+      RECOVER_LAT = receiver_recovery_latitude,
+      RECOVER_LONG = receiver_recovery_longitude
     ) %>%
-    separate(
-      col = receiver_name,
-      into = c("INS_MODEL_NUMBER", "INS_SERIAL_NUMBER", sep = "-")
+    separate_wider_delim(
+      cols = receiver_name,
+      delim = "-",
+      names = c("INS_MODEL_NO", "INS_SERIAL_NO")
     )
 
   # Have to do a little extra manipulation on the dataframe to give "RECOVERED"
