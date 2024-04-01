@@ -56,23 +56,23 @@ imos_to_otn_receivers <- function(rcvr_dataframe) {
       cols = receiver_name,
       delim = "-",
       names = c("INS_MODEL_NO", "INS_SERIAL_NO")
-    ) 
-    
-  #We have to do some cleaning up of date formats in the appropriate columns.
-  #First we'll hit them with Lubridate to make sure they're real dates, formatted correctly.
-  #Then, since they need a "T" in there, we'll cast them back to character strings and slot a 'T'
-  #in where once there was whitespace. Simple! I don't love calling multiple near-identical mutates, but I also
-  #don't like how unreadable and cursed it is to do the requisite jiggery-pokery to get multiple functions into a single
-  #mutate(across())
+    )
+
+  # We have to do some cleaning up of date formats in the appropriate columns.
+  # First we'll hit them with Lubridate to make sure they're real dates, formatted correctly.
+  # Then, since they need a "T" in there, we'll cast them back to character strings and slot a 'T'
+  # in where once there was whitespace. Simple! I don't love calling multiple near-identical mutates, but I also
+  # don't like how unreadable and cursed it is to do the requisite jiggery-pokery to get multiple functions into a single
+  # mutate(across())
   rcvr_return <- rcvr_return %>%
     mutate(
-        across(ends_with("_DATE_TIME"), lubridate::ymd_hms)
+      across(ends_with("_DATE_TIME"), lubridate::ymd_hms)
     ) %>%
     mutate(
       across(ends_with("_DATE_TIME"), as.character)
     ) %>%
     mutate(
-      across(ends_with("_DATE_TIME"), ~stringr::str_replace(.x, " ", "T"))
+      across(ends_with("_DATE_TIME"), ~ stringr::str_replace(.x, " ", "T"))
     )
 
   # Have to do a little extra manipulation on the dataframe to give "RECOVERED"
