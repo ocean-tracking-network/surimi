@@ -45,6 +45,17 @@ imos_to_otn_tags <- function(tag_dataframe, animal_measurements_dataframe) {
       LIFE_STAGE = NA,
       AGE = NA,
       AGE_UNITS = NA,
+      ANIMAL_ID = NA,
+      TAG_ACTIVATION_DATE = NA,
+      CAPTURE_LOCATION = NA,
+      CAPTURE_LATITUDE = NA,
+      CAPTURE_LONGITUDE = NA,
+      `LENGTH2 (m)` = NA,
+      LENGTH2_TYPE = NA,
+      DNA_SAMPLE_TAKEN = NA,
+      TREATMENT_TYPE = NA,
+      RELEASE_GROUP = NA,
+      TAG_IMPLANT_METHOD = NA
     ) %>%
     rename(
       # Columns we now have that need to be renamed.
@@ -136,5 +147,17 @@ imos_to_otn_tags <- function(tag_dataframe, animal_measurements_dataframe) {
       `WEIGHT (kg)` = WEIGHT
     )
 
+  #Gotta do the same sleight of hand here for utc_release_date_time as in receivers.
+  tag_return <- tag_return %>%
+    mutate(
+      across(ends_with("_DATE_TIME"), lubridate::ymd_hms)
+    ) %>%
+    mutate(
+      across(ends_with("_DATE_TIME"), as.character)
+    ) %>%
+    mutate(
+      across(ends_with("_DATE_TIME"), ~ stringr::str_replace(.x, " ", "T"))
+    )
+  
   return(tag_return)
 }
