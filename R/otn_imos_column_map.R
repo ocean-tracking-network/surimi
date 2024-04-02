@@ -415,8 +415,8 @@ derive_tag_from_det <- function(det_dataframe, tagname_column = "tagname") {
   # Group by tagname. We may need to add the option to use alternative columns in the future, but that's doable, I think.
   # tagname_column <- as.name(tagname_column)
   distinctTag <- det_dataframe %>%
-    group_by_at(tagname_column) %>%
-    distinct_at(tagname_column, .keep_all = TRUE)
+    group_by(across(tagname_column)) %>%
+    distinct(across(tagname_column), .keep_all = TRUE)
 
   # To get the correct transmitter lat/lon, we need to get the releases.
   releases <- det_dataframe %>%
