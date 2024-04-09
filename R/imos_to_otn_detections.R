@@ -12,31 +12,40 @@
 #' @export
 #'
 
-imos_to_otn_detections <- function(detection_dataframe) {
+imos_to_otn_detections <- function(detection_dataframe, coll_code = NULL) {
   det_return <- detection_dataframe %>%
     dplyr::select(
       detection_datetime,
       receiver_name,
-      receiver_id,
       transmitter_id,
-      transmitter_sensor_raw_value,
+      transmitter_sensor_value,
       transmitter_sensor_unit,
+      transmitter_sensor_type,
       station_name,
+      receiver_project_name,
       receiver_deployment_latitude,
-      receiver_deployment_longitude
+      receiver_deployment_longitude,
+      species_scientific_name,
+      species_common_name,
+      ends_with("_QC"),
     ) %>%
     mutate(
-      transmitter_name = NA,
-      transmitter_serial = NA,
+      sensorname = transmitter_id,
+      detectedby = receiver_project_name,
+      collectioncode = coll_code,
     ) %>%
     rename(
-      date_ane_time = detection_datetime,
+      date_and_time = detection_datetime,
       receiver = receiver_name,
-      transmitter = transmitter_id,
-      sensor_value = transmitter_sensor_raw_value,
-      sensor_unit = transmitter_sensor_unit,
+      tagname = transmitter_id,
+      sensorvalue = transmitter_sensor_value,
+      sensorunit = transmitter_sensor_unit,
       latitude = receiver_deployment_latitude,
-      longitude = receiver_deployment_longitude
+      longitude = receiver_deployment_longitude,
+      scientificname = species_scientific_name,
+      commonname = species_common_name,
+      sensortype = transmitter_sensor_type,
+      station = station_name,
     )
 
   return(det_return)
