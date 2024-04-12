@@ -8,7 +8,9 @@ otn_imos_column_map(
   det_dataframe,
   rcvr_dataframe = NULL,
   tag_dataframe = NULL,
-  derive = TRUE
+  derive = TRUE,
+  coll_code = NULL,
+  tagname_column = "tagname"
 )
 }
 \arguments{
@@ -22,6 +24,14 @@ otn_imos_column_map(
 extract dataframe to generate dataframes for either or both of the receiver and tag dataframes, if they are not passed in. Although
 this will result in missing information, it does let the user supply only a detection extract file, which is a situation some may
 find themselves in.}
+
+\item{coll_code}{The user-supplied collectioncode, which we'll use to populate the receiver_project_name and tagging_project_name
+columns in the receiver and tag metadata files respectively. We don't have a good way to associate the relevant info from the det
+extract to the appropriate columns in the rcvr/tag metadata, but those datasets are restricted to one collectioncode each, so
+we can just take it from the user at the time they run the code.}
+
+\item{tagname_column}{The name of the column that's equivalent to 'tagname', if the tagname column isn't present. Should only be
+necessary if deriving.}
 }
 \value{
 Returns a list containing three approximately IMOS-formatted dataframes.

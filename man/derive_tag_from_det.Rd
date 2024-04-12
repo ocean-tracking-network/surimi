@@ -4,11 +4,14 @@
 \alias{derive_tag_from_det}
 \title{Derive a tag metadata data.frame from OTN-formatted data to IMOS-format}
 \usage{
-derive_tag_from_det(det_dataframe)
+derive_tag_from_det(det_dataframe, tagname_column = "tagname")
 }
 \arguments{
 \item{det_dataframe}{The dataframe containing detection information.
 Most likely a detection extract.}
+
+\item{tagname_column}{The name of the column equivalent to 'tagname', if tagname isn't present. This
+is getting passed in from the above function, but it's here too as a fallback in case the function gets used on its own.}
 }
 \description{
 Hack together a piecemeal tag metadata data.frame for instances
