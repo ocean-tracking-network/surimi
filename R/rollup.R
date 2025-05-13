@@ -16,11 +16,7 @@
 #' @export
 #'
 #
-
-# For what it's worth, I ad a lot of ideas for names for this function, including 'bento' (because it pairs the output of 'surimi' with something else), or
-# 'mcfly' (because it takes you back to the starting point of your adventure made whole but nonetheless irrevocably altered) but those are a little obscure and if I'm being honest, I have little patience
-# for that kind of tweeness. Even 'rollup' (referring to making a sushi roll, in the same vein as 'bento') is a little much.
-
+ 
 rollup <- function(detection_extract, remora_output) {
   # Read in the two dataframes.
   otn_dets <- read.csv(detection_extract)
