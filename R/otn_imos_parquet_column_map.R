@@ -3,7 +3,7 @@
 ##' @description Takes three dataframes in the OTN format- one for a detection extract, one for receiver deployment metadata, and one for tag metadata-
 ##' and rearranges, renames, and creates columns until they can pass for IMOS-format dataframes. This allows us to pass the data directly
 ##' into Remora without making substantial changes to how that code runs or what it looks for. This is functionally identical to otn_imos_column_map() except that the
-##' column names on the OTN side reflect that the detection dataframe came from our new parquet format rather than our old CSV format. 
+##' column names on the OTN side reflect that the detection dataframe came from our new parquet format rather than our old CSV format.
 ##'
 ##' @param det_dataframe The dataframe containing detection information.
 ##' @param rcvr_dataframe The dataframe containing receiver information.
@@ -33,40 +33,40 @@ otn_imos_parquet_column_map <- function(det_dataframe, rcvr_dataframe = NULL, ta
   # - A receiver dataframe with appropriate columns, if necessary with data derived from the detections dataframe.
   # - A tag dataframe, same constraints as above.
   # - An animal measurements dataframe with data derived from the tag dataframe.
-  
+
   # At the end of all this we return three dataframes- det_data, rec_data, tag_data- that can be passed through to the merge at the bottom of the get_data function.
   # Animal measurements is a bit weird so I'm going to ignore it for now.
-  
+
   # This probably won't have the full range of columns that the equivalent IMOS data would.
-  
+
   # This way, if we don't end up having any way to change these throughout- i.e, no rcvr/tag sheets have been passed-
   # we just return whatever we got, unaltered. Probably null.
   tag_return <- tag_dataframe
   rcvr_return <- rcvr_dataframe
-  
+
   # Quit instantly if there is no detections dataframe. This is unlikely since this check already happens in the function above, but for completeness'
   # sake we'll include it.
   if (is.null(det_dataframe)) stop("\033[31;1mCan not run otn -> imos conversion without a detections file!\033[0m\n")
-  
+
   if (!is.data.frame(det_dataframe)) {
     det_dataframe <- read_parquet(det_dataframe)
   }
-  
+
   # If we don't get passed a receiver or tag dataframe, we derive them from det. This will give us hopefully enough info that we can create the final
   # detection dataframe to be returned, which will be valid for Remora. Ideally.
   if (is.null(rcvr_dataframe) && derive) {
     message("Deriving receiver dataframe...")
     rcvr_return <- derive_rcvr_from_det(det_dataframe)
   }
-  
+
   if (is.null(tag_dataframe) && derive) {
     message("Deriving tag dataframe...")
     tag_return <- derive_tag_from_det(det_dataframe, tagname_column)
   }
-  
+
   # Construct a little lookup table for the aphiaIDs. This keeps us from having to query the WORMS database over and over again (for example, the data I tested on had 300 entries for 'blue shark')- lot of redundant querying there.
   lookup <- get_unique_aphiaids(det_dataframe$scientificname)
-  
+
   # Start by mapping the Detections dataframe.
   det_return <- det_dataframe %>%
     select(
@@ -129,7 +129,7 @@ otn_imos_parquet_column_map <- function(det_dataframe, rcvr_dataframe = NULL, ta
       # the column names like so, we have to introduce a step that maybe we'd rather skip.
     )
   det_return$transmitter_deployment_id <- det_return$tag_id
-  
+
   # If we have receiver_meta, convert that to an IMOS friendly version.
   if (!is.null(rcvr_dataframe) && !derive) {
     rcvr_return <- rcvr_dataframe %>%
@@ -184,7 +184,7 @@ otn_imos_parquet_column_map <- function(det_dataframe, rcvr_dataframe = NULL, ta
         receiver_project_name = coll_code,
       )
   }
-  
+
   # And if we have tag metadata, convert that too.
   if (!is.null(tag_dataframe) && !derive) {
     tag_return <- tag_dataframe %>%
@@ -286,48 +286,48 @@ otn_imos_parquet_column_map <- function(det_dataframe, rcvr_dataframe = NULL, ta
 derive_rcvr_from_det <- function(det_dataframe) {
   # To start, we will filter the releases out of our detections dataframe.
   no_releases <- det_dataframe %>% filter(receiver != "release")
-  
+
   # The first thing we need to do is gin up some inferred min and max deployment dates.
   # We'll use the following code to do so.
   rcvr_grouped <- NULL
-  
+
   # Start by grouping the detections by station, and ordering them by date.
   rcvr_grouped_list <- no_releases %>%
     group_by(station) %>%
     arrange(dateCollectedUTC, .by_group = TRUE)
-  
+
   # Set min date and max date to null.
   minDate <- NULL
   maxDate <- NULL
-  
+
   # Create a 'lead' dataframe for us to compare our current dataframe against.
   rcvr_grouped_list_next <- lead(rcvr_grouped_list)
-  
+
   # For each row in the list
   for (i in 1:nrow(rcvr_grouped_list)) {
     row <- rcvr_grouped_list[i, ]
-    
+
     # If minDate is null, set it to the currently available date. minDate being null implies that
     # we're just starting with this station (see where it's set to Null, below)
     if (is.null(minDate)) {
       minDate <- row$dateCollectedUTC
     }
-    
+
     # Get the next row from our "lead" frame.
     nextStation <- rcvr_grouped_list_next[i, ]
-    
+
     # If our next station is Null (i.e, we're at the end of the frame), or the next station is different from
     # the current one (i.e, we've reached the end of this time chunk)...
     if (is.na(nextStation$receiver) || nextStation$receiver != row$receiver) {
       # Set Maxdate to our current date.
       maxDate <- row$dateCollectedUTC
-      
+
       # Add the min and max dates as entries in the row.
       row <- row %>% mutate(
         minDetectionDate = minDate,
         maxDetectionDate = maxDate
       )
-      
+
       # if rcvr_group hasn't been instantiated yet, use row to create it.
       if (is.null(rcvr_grouped)) {
         rcvr_grouped <- row
@@ -336,16 +336,16 @@ derive_rcvr_from_det <- function(det_dataframe) {
       else {
         rcvr_grouped <- rbind(rcvr_grouped, row)
       }
-      
+
       # reset our min and max date to null so the next group will be handled properly.
       minDate <- NULL
       maxDate <- NULL
     }
   }
-  
+
   # Now we have rcvr_grouped, which contains the receiver metadata with the inferred min and max dates.
   # We can now rename the columns and do the remainder of the manipulation work as normal.
-  
+
   rcvr <- rcvr_grouped %>%
     select(
       # Select the columns from the detection extract that we have access to.
@@ -359,7 +359,7 @@ derive_rcvr_from_det <- function(det_dataframe) {
       minDetectionDate,
       maxDetectionDate
     ) %>%
-    unite( #??
+    unite( # ??
       receiver_deployment_id, c("collectionCode", "station"),
       sep = "-", remove = FALSE
     ) %>%
@@ -383,7 +383,7 @@ derive_rcvr_from_det <- function(det_dataframe) {
       receiver_recovery_longitude = NA,
       receiver_recovery_latitude = NA
     )
-  
+
   return(as.data.frame(rcvr))
 }
 
@@ -407,11 +407,11 @@ derive_rcvr_from_det <- function(det_dataframe) {
 ##' @keywords internal
 ##'
 derive_tag_from_det <- function(det_dataframe, tagname_column = "tagName") {
-  # Group by tagname. 
+  # Group by tagname.
   distinctTag <- det_dataframe %>%
     group_by(across(tagname_column)) %>%
     distinct(across(tagname_column), .keep_all = TRUE)
-  
+
   # To get the correct transmitter lat/lon, we need to get the releases.
   releases <- det_dataframe %>%
     filter(receiver == "release") %>%
@@ -460,19 +460,19 @@ derive_tag_from_det <- function(det_dataframe, tagname_column = "tagName") {
       transmitter_recovery_latitude = NA,
       transmitter_recovery_longitude = NA,
     )
-  
-  
+
+
   # Now we can join the releases to get the appropriate transmitter_deployment_lat/lon
   tag <- left_join(tag,
-                   releases %>% dplyr::select(
-                     transmitter_deployment_id,
-                     transmitter_deployment_latitude,
-                     transmitter_deployment_longitude,
-                     transmitter_deployment_datetime,
-                     transmitter_deployment_locality
-                   ),
-                   by = "transmitter_deployment_id"
+    releases %>% dplyr::select(
+      transmitter_deployment_id,
+      transmitter_deployment_latitude,
+      transmitter_deployment_longitude,
+      transmitter_deployment_datetime,
+      transmitter_deployment_locality
+    ),
+    by = "transmitter_deployment_id"
   )
-  
+
   return(as.data.frame(tag))
 }

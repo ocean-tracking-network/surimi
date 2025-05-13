@@ -16,7 +16,7 @@
 #' @export
 #'
 #
- 
+
 rollup <- function(detection_extract, remora_output) {
   # Read in the two dataframes.
   otn_dets <- read.csv(detection_extract)
