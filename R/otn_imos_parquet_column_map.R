@@ -440,7 +440,9 @@ derive_tag_from_det <- function(det_dataframe, tagname_column = "tagName") {
       species_common_name = commonName,
       species_scientific_name = scientificName,
       transmitter_deployment_id = catalogNumber,
-      tagging_project_name = collectionCode
+      tagging_project_name = collectionCode,
+      latitude = decimalLatitude,
+      longitude = decimalLongitude
     ) %>%
     mutate(
       transmitter_serial_number = NA,
