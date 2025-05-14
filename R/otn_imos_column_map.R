@@ -47,8 +47,7 @@ otn_imos_column_map <- function(det_dataframe, rcvr_dataframe = NULL, tag_datafr
   if (is.null(det_dataframe)) stop("\033[31;1mCan not run otn -> imos conversion without a detections file!\033[0m\n")
 
   if (!is.data.frame(det_dataframe)) {
-    # TODO- parquet as well.
-    det_dataframe <- read.csv(det_dataframe)
+    det_dataframe <- read.csv(det_dataframe, na = c("", "null", "NA"))
   }
 
   # If we don't get passed a receiver or tag dataframe, we derive them from det. This will give us hopefully enough info that we can create the final

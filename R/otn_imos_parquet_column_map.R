@@ -108,7 +108,6 @@ otn_imos_parquet_column_map <- function(det_dataframe, rcvr_dataframe = NULL, ta
     ) %>%
     # We need to make these transmitter and receiver deployment ID columns so that we have something to join on. These do not necessarily correspond to our
     # own catalognumber fields.
-    # TODO: Relies on receiver_group, needs clarification above.
     unite(
       receiver_deployment_id, c("collectionCode", "station"),
       sep = "-", remove = FALSE
@@ -116,7 +115,6 @@ otn_imos_parquet_column_map <- function(det_dataframe, rcvr_dataframe = NULL, ta
     rename(
       transmitter_id = tagName,
       tag_id = catalogNumber,
-      tagging_project_name = collectionCode,
       species_common_name = commonName,
       species_scientific_name = scientificName,
       detection_datetime = dateCollectedUTC,
@@ -129,6 +127,7 @@ otn_imos_parquet_column_map <- function(det_dataframe, rcvr_dataframe = NULL, ta
       # the column names like so, we have to introduce a step that maybe we'd rather skip.
     )
   det_return$transmitter_deployment_id <- det_return$tag_id
+  det_return$tagging_project_name <- det_return$installation_name
 
   # If we have receiver_meta, convert that to an IMOS friendly version.
   if (!is.null(rcvr_dataframe) && !derive) {
