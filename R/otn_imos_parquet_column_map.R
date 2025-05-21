@@ -65,7 +65,11 @@ otn_imos_parquet_column_map <- function(det_dataframe, rcvr_dataframe = NULL, ta
   }
 
   # Construct a little lookup table for the aphiaIDs. This keeps us from having to query the WORMS database over and over again (for example, the data I tested on had 300 entries for 'blue shark')- lot of redundant querying there.
-  lookup <- get_unique_aphiaids(det_dataframe$scientificname)
+  View(det_dataframe$scientificName)
+  
+  lookup <- get_unique_aphiaids(det_dataframe$scientificName)
+  
+  View(lookup)
 
   # Start by mapping the Detections dataframe.
   det_return <- det_dataframe %>%
