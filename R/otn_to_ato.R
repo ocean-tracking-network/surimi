@@ -1,4 +1,4 @@
-otn_to_ato <- function(otn_detections) {
+otn_to_ato <- function(otn_detections, otn_receivers = "", otn_tags = "") {
   #Determine whether or not we're dealing with a file or a dataframe. 
   if (!is.data.frame(otn_detections)) {
     extension <- tools::file_ext(otn_detections)
@@ -24,23 +24,25 @@ otn_to_ato <- function(otn_detections) {
   
   OTN_ATO <- add(OTN_ATO, det)
   
-  #Got to double check this against the IMOS stuff, see how we're ginning that up. 
-  dep <- make_dep(receiver_model = NA_character_,
-                  receiver_serial = otn_detections$receiver,
-                  receiver_codeset = otn_detections$codeSpace,
-                  deploy_location = otn_detections$station
-                  deploy_datetime = as.POSIXct(NA_real_),
-                  deploy_lat = otn_detections$decimalLatitude,
-                  deploy_lon = otn_detections$decimalLongitude,
-                  recover_datetime = actel:::example.deployments$Stop,
-                  recover_lat = actel:::example.spatial$Latitude[-18],
-                  recover_lon = actel:::example.spatial$Longitude[-18],
-                  transmitter = NA_character_,
-                  transmitter_model = NA_character_,
-                  transmitter_serial = NA_integer_,
-                  tz = "UTC")
-    
-  )
+  dep <- ato_dep_from_otn()
+
+  OTN_ATO <- add(OTN_ATO, dep)
+
+  make_tag <- function(manufacturer = NA_character_,
+                     model = NA_character_,
+                     power_level = NA_real_,
+                     ping_rate = NA_real_,
+                     ping_variation = NA_real_,
+                     serial = NA_integer_,
+                     transmitter = NA_character_,
+                     activation_datetime = as.POSIXct(NA_real_),
+                     battery_life = NA_real_,
+                     sensor_type = NA_character_,
+                     sensor_unit = NA_character_,
+                     animal = NA_character_,
+                     tz = "UTC")
+  
+  OTN_ATO <- add(OTN_ATO, tag)
   
   return(OTN_ATO)
  }
