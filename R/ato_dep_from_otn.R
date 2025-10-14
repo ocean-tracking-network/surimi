@@ -6,7 +6,7 @@ ato_dep_from_otn <- function(otn_file, type = "meta") {
     } else {
       otn_file <- read.csv(otn_detections, na = c("", "null", "NA"))
     }
-  }
+  }g
   
   if(type == "meta") {
     #This we can pull directly from the metadata.
