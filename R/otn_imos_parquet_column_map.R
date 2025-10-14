@@ -18,6 +18,8 @@
 ##' we can just take it from the user at the time they run the code.
 ##' @param tagname_column The name of the column that's equivalent to 'tagname', if the tagname column isn't present. Should only be
 ##' necessary if deriving.
+##' @param format Defaults to parquet. Since the column names are the same across parquet files and new-style CSV files, this function can handle both as long as it knows what it's getting. Calling map_otn_file will handle all
+##' the checking for the user, though.
 ##'
 ##' @importFrom dplyr select '%>%' mutate rename group_by arrange distinct filter left_join
 ##' @importFrom tidyr unite
@@ -27,7 +29,7 @@
 ##' @return Returns a list containing three approximately IMOS-formatted dataframes.
 ##' @export
 ##'
-otn_imos_parquet_column_map <- function(det_dataframe, rcvr_dataframe = NULL, tag_dataframe = NULL, derive = TRUE, coll_code = NULL, tagname_column = "tagName") {
+otn_imos_new_style_column_map <- function(det_dataframe, rcvr_dataframe = NULL, tag_dataframe = NULL, derive = TRUE, coll_code = NULL, tagname_column = "tagName", format="parquet") {
   # We need to ultimately produce the following:
   # - A detections dataframe with columns appropriate to the IMOS spec.
   # - A receiver dataframe with appropriate columns, if necessary with data derived from the detections dataframe.
@@ -49,7 +51,12 @@ otn_imos_parquet_column_map <- function(det_dataframe, rcvr_dataframe = NULL, ta
   if (is.null(det_dataframe)) stop("\033[31;1mCan not run otn -> imos conversion without a detections file!\033[0m\n")
 
   if (!is.data.frame(det_dataframe)) {
-    det_dataframe <- read_parquet(det_dataframe)
+    if(format == "parquet") {
+      det_dataframe <- read_parquet(det_dataframe)
+    }
+    else if(format == "csv") {
+      det_dataframe <- read.csv(det_dataframe, na = c("", "null", "NA"))
+    }
   }
 
   # If we don't get passed a receiver or tag dataframe, we derive them from det. This will give us hopefully enough info that we can create the final
