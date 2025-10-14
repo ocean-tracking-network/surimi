@@ -29,7 +29,7 @@
 ##' @return Returns a list containing three approximately IMOS-formatted dataframes.
 ##' @export
 ##'
-otn_imos_new_style_column_map <- function(det_dataframe, rcvr_dataframe = NULL, tag_dataframe = NULL, derive = TRUE, coll_code = NULL, tagname_column = "tagName", format="parquet") {
+otn_imos_new_style_column_map <- function(det_dataframe, rcvr_dataframe = NULL, tag_dataframe = NULL, derive = TRUE, coll_code = NULL, tagname_column = "tagName", format = "parquet") {
   # We need to ultimately produce the following:
   # - A detections dataframe with columns appropriate to the IMOS spec.
   # - A receiver dataframe with appropriate columns, if necessary with data derived from the detections dataframe.
@@ -51,10 +51,9 @@ otn_imos_new_style_column_map <- function(det_dataframe, rcvr_dataframe = NULL, 
   if (is.null(det_dataframe)) stop("\033[31;1mCan not run otn -> imos conversion without a detections file!\033[0m\n")
 
   if (!is.data.frame(det_dataframe)) {
-    if(format == "parquet") {
+    if (format == "parquet") {
       det_dataframe <- read_parquet(det_dataframe)
-    }
-    else if(format == "csv") {
+    } else if (format == "csv") {
       det_dataframe <- read.csv(det_dataframe, na = c("", "null", "NA"))
     }
   }
