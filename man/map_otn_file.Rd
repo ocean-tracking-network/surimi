@@ -2,7 +2,8 @@
 % Please edit documentation in R/map_otn_file.R
 \name{map_otn_file}
 \alias{map_otn_file}
-\title{Determine whether an input file is CSV or Parquet and pipe it into the correct mapping function.}
+\title{Determine whether an input file is CSV or Parquet and pipe it into the correct mapping function. Hopefully this is all a stopgap until the typical format of OTN -> ATO and then ATO -> IMOS gets done, at which point
+those pipeline pieces will connect together. But for now, this will keep dependent software like Remora running.}
 \usage{
 map_otn_file(filename, derive = TRUE, coll_code = NULL)
 }
@@ -17,5 +18,6 @@ map_otn_file(filename, derive = TRUE, coll_code = NULL)
 The output of the appropriate mapping function.
 }
 \description{
-Determine whether an input file is CSV or Parquet and pipe it into the correct mapping function.
+Determine whether an input file is CSV or Parquet and pipe it into the correct mapping function. Hopefully this is all a stopgap until the typical format of OTN -> ATO and then ATO -> IMOS gets done, at which point
+those pipeline pieces will connect together. But for now, this will keep dependent software like Remora running.
 }
