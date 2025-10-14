@@ -11,21 +11,19 @@
 map_otn_file <- function(filename, derive = TRUE, coll_code = NULL) {
   extension <- tools::file_ext(filename)
   if (extension == "parquet") {
-    #If the file is a parquet file, then just call the appropriate mapping function.
+    # If the file is a parquet file, then just call the appropriate mapping function.
     return(otn_imos_new_style_column_map(filename, derive = derive, coll_code = coll_code, tagname_column = "tagName"))
-  } else if(extension == "csv") {
-    #Since 'new_style' can take both parquets and new CSVs, here we need to check which is getting passed. We'll just get the first couple of columns to check.
-    col_check <- read.csv(filename, nrows=3)
+  } else if (extension == "csv") {
+    # Since 'new_style' can take both parquets and new CSVs, here we need to check which is getting passed. We'll just get the first couple of columns to check.
+    col_check <- read.csv(filename, nrows = 3)
     cols <- names(col_check)
-    #On a whim we'll use 'datecollected' to check if it's an old-style file. 
+    # On a whim we'll use 'datecollected' to check if it's an old-style file.
     if ("datecollected" %in% cols) {
       return(otn_imos_column_map(filename, derive = derive, coll_code = coll_code, tagname_column = "tagname"))
+    } else {
+      return(otn_imos_new_style_column_map(filename, derive = derive, coll_code = coll_code, tagname_column = "tagName", format = "csv"))
     }
-    else {
-      return(otn_imos_new_style_column_map(filename, derive = derive, coll_code = coll_code, tagname_column = "tagName", format="csv"))
-    }
-  }
-  else {
+  } else {
     message("map_otn_file can only take parquet and CSV files. Please double check that you're using the right file type and try again.")
   }
 }
