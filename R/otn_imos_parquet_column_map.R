@@ -63,20 +63,16 @@ otn_imos_new_style_column_map <- function(det_dataframe, rcvr_dataframe = NULL, 
   # detection dataframe to be returned, which will be valid for Remora. Ideally.
   if (is.null(rcvr_dataframe) && derive) {
     message("Deriving receiver dataframe...")
-    rcvr_return <- derive_rcvr_from_det(det_dataframe)
+    rcvr_return <- derive_rcvr_from_new_style_det(det_dataframe)
   }
 
   if (is.null(tag_dataframe) && derive) {
     message("Deriving tag dataframe...")
-    tag_return <- derive_tag_from_det(det_dataframe, tagname_column)
+    tag_return <- derive_tag_from_new_style_det(det_dataframe, tagname_column)
   }
 
   # Construct a little lookup table for the aphiaIDs. This keeps us from having to query the WORMS database over and over again (for example, the data I tested on had 300 entries for 'blue shark')- lot of redundant querying there.
-  View(det_dataframe$scientificName)
-
   lookup <- get_unique_aphiaids(det_dataframe$scientificName)
-
-  View(lookup)
 
   # Start by mapping the Detections dataframe.
   det_return <- det_dataframe %>%
@@ -293,7 +289,7 @@ otn_imos_new_style_column_map <- function(det_dataframe, rcvr_dataframe = NULL, 
 ##'
 ##' @keywords internal
 ##'
-derive_rcvr_from_det <- function(det_dataframe) {
+derive_rcvr_from_new_style_det <- function(det_dataframe) {
   # To start, we will filter the releases out of our detections dataframe.
   no_releases <- det_dataframe %>% filter(receiver != "release")
 
@@ -416,7 +412,7 @@ derive_rcvr_from_det <- function(det_dataframe) {
 ##'
 ##' @keywords internal
 ##'
-derive_tag_from_det <- function(det_dataframe, tagname_column = "tagName") {
+derive_tag_from_new_style_det <- function(det_dataframe, tagname_column = "tagName") {
   # Group by tagname.
   distinctTag <- det_dataframe %>%
     group_by(across(tagname_column)) %>%
