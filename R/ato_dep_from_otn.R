@@ -1,13 +1,18 @@
 ato_dep_from_otn <- function(otn_file, type = "meta") {
+  #Read in the file we've been given if we haven't been handed a dataframe.
   if (!is.data.frame(otn_file)) {
+    #Grab the extension.
     extension <- tools::file_ext(otn_detections)
+    #If it's a parquet, read it in as one...
     if (extension == "parquet") {
       otn_file <- read_parquet(otn_detections)
     } else {
+      #Otherwise bring it in as a CSV. 
       otn_file <- read.csv(otn_detections, na = c("", "null", "NA"))
     }
-  }g
+  }
   
+  #If we've been given a metadata file, we read it in as one.
   if(type == "meta") {
     #This we can pull directly from the metadata.
     dep <- make_dep(receiver_model = otn_file$INS_MODEL_NO,
@@ -95,7 +100,7 @@ ato_dep_from_otn <- function(otn_file, type = "meta") {
     dep <- make_dep(receiver_model = NA_character_,
                     receiver_serial = rcvr_grouped$receiver,
                     receiver_codeset = rcvr_grouped$codeSpace,
-                    deploy_location = rcvr_grouped$station
+                    deploy_location = rcvr_grouped$station,
                     deploy_datetime = as.POSIXct(NA_real_),
                     deploy_lat = rcvr_grouped$decimalLatitude,
                     deploy_lon = rcvr_grouped$decimalLongitude,
