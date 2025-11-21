@@ -98,7 +98,7 @@ ato_dep_from_otn <- function(otn_file, type = "meta") {
     }
     
     dep <- make_dep(receiver_model = NA_character_,
-                    receiver_serial = rcvr_grouped$receiver,
+                    receiver_serial = as.integer(rcvr_grouped$receiver),
                     receiver_codeset = rcvr_grouped$codeSpace,
                     deploy_location = rcvr_grouped$station,
                     deploy_datetime = as.POSIXct(NA_real_),

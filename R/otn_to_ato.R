@@ -61,7 +61,8 @@ otn_to_ato <- function(otn_detections, otn_receivers = "", otn_tags = "") {
     dep <- ato_dep_from_otn(otn_receivers, type = "meta")
   }
   else {
-    dep <- ato_dep_from_otn(otn_file, type = "extract")
+    dep <- ato_dep_from_otn(otn_detections, type = "extract")
+    #View(dep)
   }
   
   OTN_ATO <- add(OTN_ATO, dep)
@@ -71,7 +72,7 @@ otn_to_ato <- function(otn_detections, otn_receivers = "", otn_tags = "") {
     tag <- ato_tag_from_otn(otn_tags, type = "meta")
   } 
   else {
-    tag <- ato_tag_from_otn(otn_file, type = "extract")
+    tag <- ato_tag_from_otn(otn_detections, type = "extract")
   }
 
   OTN_ATO <- add(OTN_ATO, tag)
