@@ -58,8 +58,7 @@ otn_to_ato <- function(otn_detections, otn_receivers = "", otn_tags = "") {
   # the extract.
   if (otn_receivers != "") {
     dep <- ato_dep_from_otn(otn_receivers, type = "meta")
-  }
-  else {
+  } else {
     dep <- ato_dep_from_otn(otn_detections, type = "extract")
   }
 
@@ -67,8 +66,7 @@ otn_to_ato <- function(otn_detections, otn_receivers = "", otn_tags = "") {
 
   if (otn_tags != "") {
     tag <- ato_tag_from_otn(otn_tags, type = "meta")
-  } 
-  else {
+  } else {
     tag <- ato_tag_from_otn(otn_detections, type = "extract")
   }
 
