@@ -6,6 +6,9 @@ ato_dep_from_otn <- function(otn_file, type = "meta") {
     # If it's a parquet, read it in as one...
     if (extension == "parquet") {
       otn_file <- read_parquet(otn_detections)
+    }
+    else if (extension == "xlsx" || extension == "xls") {
+      otn_file <- read_excel(otn_detections) 
     } else {
       # Otherwise bring it in as a CSV.
       otn_file <- read.csv(otn_detections, na = c("", "null", "NA"))
