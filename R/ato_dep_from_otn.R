@@ -97,21 +97,23 @@ ato_dep_from_otn <- function(otn_file, type = "meta") {
       }
     }
 
-    dep <- make_dep(receiver_model = NA_character_,
-        receiver_serial = as.integer(rcvr_grouped$receiver),
-        receiver_codeset = rcvr_grouped$codeSpace,
-        deploy_location = rcvr_grouped$station,
-        deploy_datetime = as.POSIXct(NA_real_),
-        deploy_lat = rcvr_grouped$decimalLatitude,
-        deploy_lon = rcvr_grouped$decimalLongitude,
-        recover_datetime = as.POSIXct(NA_real_),
-        recover_lat = NA_real_,
-        recover_lon = NA_real_,
-        transmitter = NA_character_,
-        transmitter_model = NA_character_,
-        transmitter_serial = NA_integer_,
-        tz = "UTC")
-    
+    dep <- make_dep(
+      receiver_model = NA_character_,
+      receiver_serial = as.integer(rcvr_grouped$receiver),
+      receiver_codeset = rcvr_grouped$codeSpace,
+      deploy_location = rcvr_grouped$station,
+      deploy_datetime = as.POSIXct(NA_real_),
+      deploy_lat = rcvr_grouped$decimalLatitude,
+      deploy_lon = rcvr_grouped$decimalLongitude,
+      recover_datetime = as.POSIXct(NA_real_),
+      recover_lat = NA_real_,
+      recover_lon = NA_real_,
+      transmitter = NA_character_,
+      transmitter_model = NA_character_,
+      transmitter_serial = NA_integer_,
+      tz = "UTC"
+    )
+
     return(dep)
   } else {
     message("Invalid type specified. Use either 'meta' (if loading from a metadata file) or 'extract' (if deriving deployment metadata from a detection extract).")
