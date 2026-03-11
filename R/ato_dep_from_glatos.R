@@ -27,39 +27,39 @@ ato_dep_from_glatos <- function(glatos_file, type = "meta") {
   } else if (type == "extract") {
     # In the case where we don't have a metadata file to work with, we can use a similar setup to how we derive
     # receiver data from detection extracts for IMOS.
-    
+
     # To start, we will filter the releases out of our detections dataframe.
     no_releases <- glatos_data %>% filter(receiver_sn != "release")
     
     # The first thing we need to do is gin up some inferred min and max deployment dates.
     # We'll use the following code to do so.
     rcvr_grouped <- NULL
-    
+
     # Start by grouping the detections by station, and ordering them by date.
     rcvr_grouped_list <- no_releases %>%
       group_by(station) %>%
       arrange(detection_timestamp_utc, .by_group = TRUE)
-    
+
     # Set min date and max date to null.
     minDate <- NULL
     maxDate <- NULL
-    
+
     # Create a 'lead' dataframe for us to compare our current dataframe against.
     rcvr_grouped_list_next <- lead(rcvr_grouped_list)
-    
+
     # For each row in the list
     for (i in 1:nrow(rcvr_grouped_list)) {
       row <- rcvr_grouped_list[i, ]
-      
+
       # If minDate is null, set it to the currently available date. minDate being null implies that
       # we're just starting with this station (see where it's set to Null, below)
       if (is.null(minDate)) {
         minDate <- row$detection_timestamp_utc
       }
-      
+
       # Get the next row from our "lead" frame.
       nextStation <- rcvr_grouped_list_next[i, ]
-      
+
       # If our next station is Null (i.e, we're at the end of the frame), or the next station is different from
       # the current one (i.e, we've reached the end of this time chunk)...
       if (is.na(nextStation$receiver_sn) || nextStation$receiver_sn != row$receiver_sn) {
@@ -71,7 +71,7 @@ ato_dep_from_glatos <- function(glatos_file, type = "meta") {
           minDetectionDate = minDate,
           maxDetectionDate = maxDate
         )
-        
+
         # if rcvr_group hasn't been instantiated yet, use row to create it.
         if (is.null(rcvr_grouped)) {
           rcvr_grouped <- row
@@ -80,13 +80,13 @@ ato_dep_from_glatos <- function(glatos_file, type = "meta") {
         else {
           rcvr_grouped <- rbind(rcvr_grouped, row)
         }
-        
+
         # reset our min and max date to null so the next group will be handled properly.
         minDate <- NULL
         maxDate <- NULL
       }
     }
-    
+
     dep <- make_dep(
       receiver_model = NA_character_,
       receiver_serial = as.integer(rcvr_grouped$receiver_sn),
@@ -103,7 +103,7 @@ ato_dep_from_glatos <- function(glatos_file, type = "meta") {
       transmitter_serial = rcvr_grouped$transmitter_id,
       tz = "UTC"
     )
-    
+
     return(dep)
   } else {
     message("Invalid type specified. Use either 'meta' (if loading from a metadata file) or 'extract' (if deriving deployment metadata from a detection extract).")
