@@ -1,14 +1,14 @@
 ato_dep_from_glatos <- function(glatos_file, type = "meta") {
   # Read in the file we've been given if we haven't been handed a dataframe.
   glatos_data <- load_file(glatos_file)
-  
+
   # If we've been given a metadata file, we read it in as one.
   if (type == "meta") {
     # This we can pull directly from the metadata.
     dep <- make_dep(
       receiver_model = glatos_data$ins_model_no,
       receiver_serial = glatos_data$ins_serial_no,
-      receiver_codeset = NA_character_, #???
+      receiver_codeset = NA_character_, # ???
       deploy_location = glatos_data$station_no,
       deploy_datetime = glatos_data$deploy_date_time,
       deploy_lat = glatos_data$deploy_lat,
@@ -17,10 +17,10 @@ ato_dep_from_glatos <- function(glatos_file, type = "meta") {
       recover_datetime = glatos_data$recover_Date_time,
       recover_lat = glatos_data$recover_lat,
       recover_lon = glatos_data$recover_lon,
-      transmitter = NA_character_, #???
-      transmitter_manufacturer = NA_character_, #???
-      transmitter_ping_rate = NA_character_, #???
-      transmitter_model = NA_character_, #???
+      transmitter = NA_character_, # ???
+      transmitter_manufacturer = NA_character_, # ???
+      transmitter_ping_rate = NA_character_, # ???
+      transmitter_model = NA_character_, # ???
       transmitter_serial = NA_integer_
     )
     return(dep)
@@ -30,7 +30,7 @@ ato_dep_from_glatos <- function(glatos_file, type = "meta") {
 
     # To start, we will filter the releases out of our detections dataframe.
     no_releases <- glatos_data %>% filter(receiver_sn != "release")
-    
+
     # The first thing we need to do is gin up some inferred min and max deployment dates.
     # We'll use the following code to do so.
     rcvr_grouped <- NULL
@@ -65,7 +65,7 @@ ato_dep_from_glatos <- function(glatos_file, type = "meta") {
       if (is.na(nextStation$receiver_sn) || nextStation$receiver_sn != row$receiver_sn) {
         # Set Maxdate to our current date.
         maxDate <- row$detection_timestamp_utc
-        
+
         # Add the min and max dates as entries in the row.
         row <- row %>% mutate(
           minDetectionDate = minDate,
