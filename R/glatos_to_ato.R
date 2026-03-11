@@ -28,10 +28,10 @@ glatos_to_ato <- function(glatos_detections, glatos_receivers = "", glatos_tags 
       glatos_detections <- read.csv(glatos_detections, na = c("", "null", "NA"))
     }
   }
-  
+
   # Now we have a dataframe we can start loading into an ATO object. Let's make an instance of the object.
   GLATOS_ATO <- new("ATO")
-  
+
   # Make the "detections" object,
   det <- make_det(
     datetime = as.POSIXct(glatos_detections$detection_timestamp_utc),
@@ -48,7 +48,7 @@ glatos_to_ato <- function(glatos_detections, glatos_receivers = "", glatos_tags 
   # automatically try to derive receiver/tag metadata from the extract if no file is supplied.
   dep <- ""
   tag <- ""
-  
+
   # In both cases, if a file is supplied, we'll make the metadata objects using the information therein;
   # otherwise, we'll attempt to make approximately correct receiver/tag metadata from only what's contained in
   # the extract.
@@ -62,6 +62,7 @@ glatos_to_ato <- function(glatos_detections, glatos_receivers = "", glatos_tags 
   
   if (glatos_tags != "") {
     tag <- ato_tag_from_glatos(glatos_tags, type = "meta")
+
   } else {
     tag <- ato_tag_from_glatos(glatos_detections, type = "extract")
   }
