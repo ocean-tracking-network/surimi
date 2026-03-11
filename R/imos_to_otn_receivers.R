@@ -88,5 +88,7 @@ imos_to_otn_receivers <- function(rcvr_dataframe) {
   rcvr_return$RECOVERED[rcvr_return$RECOVERED == "damaged" |
     rcvr_return$RECOVERED == "returned to vendor"] <- "failed"
 
+  rcvr_return$RECOVERED[rcvr_return$RECOVERED == "RECOVERED"] <- "y"
+
   return(rcvr_return)
 }
