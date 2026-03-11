@@ -38,11 +38,11 @@ otn_to_ato <- function(otn_detections, otn_receivers = "", otn_tags = "") {
 
   # Make the "detections" object,
   det <- make_det(
-    datetime = otn_detections$dateCollectedUTC,
-    # frac_second = NA_real_,
+    datetime = as.POSIXct(otn_detections$dateCollectedUTC),
+    frac_second = NA_real_,
     receiver_serial = as.integer(otn_detections$receiver),
     transmitter = otn_detections$tagName,
-    sensor_value = otn_detections$sensorValue,
+    sensor_value = as.numeric(otn_detections$sensorValue),
     tz = "UTC"
   )
 
