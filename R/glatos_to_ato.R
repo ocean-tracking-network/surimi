@@ -1,6 +1,6 @@
 ##' @title Convert GLATOS detection data to an ATO object.
 ##'
-##' @description Takes a GLATOS detection sheet and optionally receiver/tag metadata and returns an ATO object.
+##' @description Takes a GLATOS detection sheet and optionally receiver metadata and returns an ATO object.
 ##'
 ##' @param otn_detections The dataframe containing detection information.
 ##' @param otn_receivers The dataframe containing receiver information.
@@ -15,7 +15,7 @@
 ##' @export
 ##'
 
-glatos_to_ato <- function(glatos_detections, glatos_receivers = "", glatos_tags = "") {
+glatos_to_ato <- function(glatos_detections, glatos_receivers = "") {
   glatos_detections <- load_file(glatos_detections)
 
   # Now we have a dataframe we can start loading into an ATO object. Let's make an instance of the object.
@@ -34,9 +34,8 @@ glatos_to_ato <- function(glatos_detections, glatos_receivers = "", glatos_tags 
   GLATOS_ATO <- add(GLATOS_ATO, det)
 
   # I used to have a 'derive' argument as in some of the original OTN-to-IMOS functions but then I realised it was safer to just
-  # automatically try to derive receiver/tag metadata from the extract if no file is supplied.
+  # automatically try to derive receiver metadata from the extract if no file is supplied.
   dep <- ""
-  tag <- ""
 
   # In both cases, if a file is supplied, we'll make the metadata objects using the information therein;
   # otherwise, we'll attempt to make approximately correct receiver/tag metadata from only what's contained in
@@ -49,15 +48,11 @@ glatos_to_ato <- function(glatos_detections, glatos_receivers = "", glatos_tags 
 
   GLATOS_ATO <- add(GLATOS_ATO, dep)
 
-  # In the detection extract zip I had for reference there didn't seem to be a bespoke Tag metadata file. I'll leave this structure here in case we need to build it out further but I think it's only ever going to flop into the else.
-  # if (glatos_tags != "") {
-  #  tag <- ato_tag_from_glatos(glatos_tags, type = "meta")
-
-  # } else {
-  #  tag <- ato_tag_from_glatos(glatos_detections, type = "extract")
-  # }
-
-  # GLATOS_ATO <- add(GLATOS_ATO, tag)
+  # Tag information is not part of what's distributed in glatos publications so we can neither load it nor meaningfully derive it. 
+  
+  ani <- ato_ani_from_glatos(glatos_detections)
+  
+  GLATOS_ATO <- add(GLATOS_ATO, ani)
 
   return(GLATOS_ATO)
 }
