@@ -48,10 +48,10 @@ glatos_to_ato <- function(glatos_detections, glatos_receivers = "") {
 
   GLATOS_ATO <- add(GLATOS_ATO, dep)
 
-  # Tag information is not part of what's distributed in glatos publications so we can neither load it nor meaningfully derive it. 
-  
+  # Tag information is not part of what's distributed in glatos publications so we can neither load it nor meaningfully derive it.
+
   ani <- ato_ani_from_glatos(glatos_detections)
-  
+
   GLATOS_ATO <- add(GLATOS_ATO, ani)
 
   return(GLATOS_ATO)
