@@ -26,7 +26,7 @@ glatos_to_ato <- function(glatos_detections, glatos_receivers = "", glatos_tags 
     datetime = as.POSIXct(glatos_detections$detection_timestamp_utc),
     frac_second = NA_real_,
     receiver_serial = as.integer(glatos_detections$receiver_sn),
-    transmitter = NA_character_ #Might have to synthesize this from other fields
+    transmitter = paste(glatos_detections$transmitter_codespace, "-", glatos_detections$transmitter_id, sep=""), #Might have to synthesize this from other fields
     sensor_value = as.numeric(glatos_detections$sensor_value),
     tz = "UTC"
   )
@@ -50,14 +50,14 @@ glatos_to_ato <- function(glatos_detections, glatos_receivers = "", glatos_tags 
   GLATOS_ATO <- add(GLATOS_ATO, dep)
   
   #In the detection extract zip I had for reference there didn't seem to be a bespoke Tag metadata file. I'll leave this structure here in case we need to build it out further but I think it's only ever going to flop into the else. 
-  if (glatos_tags != "") {
-    tag <- ato_tag_from_glatos(glatos_tags, type = "meta")
+  #if (glatos_tags != "") {
+  #  tag <- ato_tag_from_glatos(glatos_tags, type = "meta")
 
-  } else {
-    tag <- ato_tag_from_glatos(glatos_detections, type = "extract")
-  }
+  #} else {
+  #  tag <- ato_tag_from_glatos(glatos_detections, type = "extract")
+  #}
   
-  GLATOS_ATO <- add(GLATOS_ATO, tag)
+  #GLATOS_ATO <- add(GLATOS_ATO, tag)
   
   return(GLATOS_ATO)
 }
