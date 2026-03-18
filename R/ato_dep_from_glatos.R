@@ -1,6 +1,11 @@
-ato_dep_from_glatos <- function(glatos_file, type = "meta") {
+ato_dep_from_glatos <- function(glatos_file, glatos_detection_data = "", type = "meta") {
   # Read in the file we've been given if we haven't been handed a dataframe.
   glatos_data <- load_file(glatos_file)
+  
+  #Detection data is an optional pass-through but if we have it, we can join it to the receiver dataframe to get additional transmitter data. 
+  if (glatos_detection_data != "" && is.data.frame(glatos_detection_data) {
+    #TODO: Join the two dataframes to get transmitter data passed through.
+  }
 
   # If we've been given a metadata file, we read it in as one.
   if (type == "meta") {
@@ -92,13 +97,13 @@ ato_dep_from_glatos <- function(glatos_file, type = "meta") {
       receiver_serial = as.integer(rcvr_grouped$receiver_sn),
       receiver_codeset = NA_character_,
       deploy_location = rcvr_grouped$station,
-      deploy_datetime = as.POSIXct(NA_real_),
+      deploy_datetime = rcvr_grouped$minDetectionDate,
       deploy_lat = rcvr_grouped$deploy_lat,
       deploy_lon = rcvr_grouped$deploy_lon,
-      recover_datetime = as.POSIXct(NA_real_),
+      recover_datetime = rcvr_grouped$maxDetectionDate,
       recover_lat = NA_real_,
       recover_lon = NA_real_,
-      transmitter = NA_character_,
+      transmitter = paste(rcvr_grouped$transmitter_code_space, "-", rcvr_grouped$transmitter_id),
       transmitter_model = NA_character_,
       transmitter_serial = rcvr_grouped$transmitter_id,
       tz = "UTC"
