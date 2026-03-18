@@ -1,39 +1,33 @@
-ato_dep_from_otn <- function(otn_file, type = "meta") {
+ato_dep_from_glatos <- function(glatos_file, glatos_detection_data = "", type = "meta") {
   # Read in the file we've been given if we haven't been handed a dataframe.
-  if (!is.data.frame(otn_file)) {
-    # Grab the extension.
-    extension <- tools::file_ext(otn_detections)
-    # If it's a parquet, read it in as one...
-    if (extension == "parquet") {
-      otn_file <- read_parquet(otn_detections)
-    } else if (extension == "xlsx" || extension == "xls") {
-      otn_file <- read_excel(otn_detections)
-    } else {
-      # Otherwise bring it in as a CSV.
-      otn_file <- read.csv(otn_detections, na = c("", "null", "NA"))
-    }
+  glatos_data <- load_file(glatos_file)
+
+  # Detection data is an optional pass-through but if we have it, we can join it to the receiver dataframe to get additional transmitter data.
+  if (glatos_detection_data != "" && is.data.frame(glatos_detection_data)) {
+    # TODO: Join the two dataframes to get transmitter data passed through.
   }
 
   # If we've been given a metadata file, we read it in as one.
   if (type == "meta") {
     # This we can pull directly from the metadata.
     dep <- make_dep(
-      receiver_model = otn_file$INS_MODEL_NO,
-      receiver_serial = otn_file$INS_SERIAL_NO,
-      receiver_codeset = otn_file$CODE_SET,
-      deploy_location = otn_file$STATION_NO,
-      deploy_datetime = otn_file$DEPLOY_DATE_TIME,
-      deploy_lat = otn_file$DEPLOY_LAT,
-      deploy_lon = otn_file$DEPLOY_LON,
-      deploy_z = otn_file$BOTTOM_DEPTH,
-      recover_datetime = otn_file$RECOVER_DATE_TIME,
-      recover_lat = otn_file$RECOVER_LAT,
-      recover_lon = otn_file$RECOVER_LON,
-      transmitter = otn_file$TRANSMITTER,
-      transmitter_manufacturer = NA_character_,
-      transmitter_ping_rate = NA_character_,
-      transmitter_model = otn_file$TRANSMIT_MODEL,
-      transmitter_serial = NA_character_
+      receiver_model = glatos_data$ins_model_no,
+      receiver_serial = glatos_data$ins_serial_no,
+      receiver_codeset = glatos_data$code_map,
+      deploy_location = glatos_data$station,
+      deploy_datetime = as.POSIXct(glatos_data$deploy_date_time),
+      tz = "UTC",
+      deploy_lat = glatos_data$deploy_lat,
+      deploy_lon = glatos_data$deploy_long,
+      deploy_z = glatos_data$bottom_depth,
+      recover_datetime = as.POSIXct(glatos_data$recover_date_time),
+      recover_lat = glatos_data$recover_lat,
+      recover_lon = glatos_data$recover_long,
+      transmitter = NA_character_, # ???
+      transmitter_manufacturer = NA_character_, # ???
+      transmitter_ping_rate = as.numeric(glatos_data$glatos_ins_frequency), # is this accurate? I think this mapping is right.
+      transmitter_model = NA_character_, # ???
+      transmitter_serial = NA_integer_
     )
     return(dep)
   } else if (type == "extract") {
@@ -41,7 +35,7 @@ ato_dep_from_otn <- function(otn_file, type = "meta") {
     # receiver data from detection extracts for IMOS.
 
     # To start, we will filter the releases out of our detections dataframe.
-    no_releases <- otn_file %>% filter(receiver != "release")
+    no_releases <- glatos_data %>% filter(receiver_sn != "release")
 
     # The first thing we need to do is gin up some inferred min and max deployment dates.
     # We'll use the following code to do so.
@@ -50,7 +44,7 @@ ato_dep_from_otn <- function(otn_file, type = "meta") {
     # Start by grouping the detections by station, and ordering them by date.
     rcvr_grouped_list <- no_releases %>%
       group_by(station) %>%
-      arrange(dateCollectedUTC, .by_group = TRUE)
+      arrange(detection_timestamp_utc, .by_group = TRUE)
 
     # Set min date and max date to null.
     minDate <- NULL
@@ -66,7 +60,7 @@ ato_dep_from_otn <- function(otn_file, type = "meta") {
       # If minDate is null, set it to the currently available date. minDate being null implies that
       # we're just starting with this station (see where it's set to Null, below)
       if (is.null(minDate)) {
-        minDate <- row$dateCollectedUTC
+        minDate <- row$detection_timestamp_utc
       }
 
       # Get the next row from our "lead" frame.
@@ -74,9 +68,9 @@ ato_dep_from_otn <- function(otn_file, type = "meta") {
 
       # If our next station is Null (i.e, we're at the end of the frame), or the next station is different from
       # the current one (i.e, we've reached the end of this time chunk)...
-      if (is.na(nextStation$receiver) || nextStation$receiver != row$receiver) {
+      if (is.na(nextStation$receiver_sn) || nextStation$receiver_sn != row$receiver_sn) {
         # Set Maxdate to our current date.
-        maxDate <- row$dateCollectedUTC
+        maxDate <- row$detection_timestamp_utc
 
         # Add the min and max dates as entries in the row.
         row <- row %>% mutate(
@@ -101,18 +95,18 @@ ato_dep_from_otn <- function(otn_file, type = "meta") {
 
     dep <- make_dep(
       receiver_model = NA_character_,
-      receiver_serial = as.integer(rcvr_grouped$receiver),
-      receiver_codeset = rcvr_grouped$codeSpace,
+      receiver_serial = as.integer(rcvr_grouped$receiver_sn),
+      receiver_codeset = NA_character_,
       deploy_location = rcvr_grouped$station,
-      deploy_datetime = as.POSIXct(NA_real_),
-      deploy_lat = rcvr_grouped$decimalLatitude,
-      deploy_lon = rcvr_grouped$decimalLongitude,
-      recover_datetime = as.POSIXct(NA_real_),
+      deploy_datetime = as.POSIXct(rcvr_grouped$minDetectionDate),
+      deploy_lat = rcvr_grouped$deploy_lat,
+      deploy_lon = rcvr_grouped$deploy_long,
+      recover_datetime = as.POSIXct(rcvr_grouped$maxDetectionDate),
       recover_lat = NA_real_,
       recover_lon = NA_real_,
-      transmitter = NA_character_,
+      transmitter = paste(rcvr_grouped$transmitter_codespace, "-", rcvr_grouped$transmitter_id, sep = ""),
       transmitter_model = NA_character_,
-      transmitter_serial = NA_integer_,
+      transmitter_serial = rcvr_grouped$transmitter_id,
       tz = "UTC"
     )
 

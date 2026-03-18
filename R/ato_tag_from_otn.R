@@ -6,6 +6,8 @@ ato_tag_from_otn <- function(otn_file, type = "meta") {
     # If it's a parquet, read it in as one...
     if (extension == "parquet") {
       otn_file <- read_parquet(otn_detections)
+    } else if (extension == "xlsx" || extension == "xls") {
+      otn_file <- read_excel(otn_detections)
     } else {
       # Otherwise bring it in as a CSV.
       otn_file <- read.csv(otn_detections, na = c("", "null", "NA"))
@@ -22,12 +24,12 @@ ato_tag_from_otn <- function(otn_file, type = "meta") {
       ping_rate = NA_real_, # ???
       ping_variation = NA_real_, # ???
       serial = otn_file$TAG_SERIAL_NUMBER,
-      transmitter = NA_character_, # ???
+      transmitter = paste(otn_file$TAG_CODE_SPACE, "-", TAG_ID_CODE),
       activation_datetime = as.POSIXct(otn_file$TAG_ACTIVATION_DATE),
       battery_life = otn_file$EST_TAG_LIFE,
       sensor_type = NA_character_, # ???
       sensor_unit = NA_character_, # ???
-      animal = NA_character_,
+      animal = otn_file$ANIMAL_ID,
       tz = "UTC"
     )
     return(tag)

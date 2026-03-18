@@ -5,10 +5,6 @@
 ##' @param otn_detections The dataframe containing detection information.
 ##' @param otn_receivers The dataframe containing receiver information.
 ##' @param otn_tags The dataframe containing tag information.
-##' @param derive An optional flag that allows the user to pass in fewer than all three files. If given, the code will use the detection
-##' extract dataframe to generate dataframes for either or both of the receiver and tag dataframes, if they are not passed in. Although
-##' this will result in missing information, it does let the user supply only a detection extract file, which is a situation some may
-##' find themselves in.
 ##'
 ##' @importFrom dplyr select '%>%' mutate rename group_by arrange distinct filter left_join
 ##' @importFrom tidyr unite
@@ -52,6 +48,7 @@ otn_to_ato <- function(otn_detections, otn_receivers = "", otn_tags = "") {
   # automatically try to derive receiver/tag metadata from the extract if no file is supplied.
   dep <- ""
   tag <- ""
+  ani <- "" # We don't have an "animals" file so this object will all have to be derived.
 
   # In both cases, if a file is supplied, we'll make the metadata objects using the information therein;
   # otherwise, we'll attempt to make approximately correct receiver/tag metadata from only what's contained in
@@ -71,6 +68,7 @@ otn_to_ato <- function(otn_detections, otn_receivers = "", otn_tags = "") {
   }
 
   OTN_ATO <- add(OTN_ATO, tag)
+
 
   return(OTN_ATO)
 }
