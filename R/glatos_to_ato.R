@@ -16,18 +16,7 @@
 ##'
 
 glatos_to_ato <- function(glatos_detections, glatos_receivers = "", glatos_tags = "") {
-  # Determine whether or not we're dealing with a file or a dataframe.
-  if (!is.data.frame(glatos_detections)) {
-    # If it's not a dataframe, get the extension.
-    extension <- tools::file_ext(glatos_detections)
-    if (extension == "parquet") {
-      # If it's a parquet file, read it in with read_parquet.
-      glatos_detections <- read_parquet(glatos_detections)
-    } else {
-      # Otherwise, read it in with read.csv.
-      glatos_detections <- read.csv(glatos_detections, na = c("", "null", "NA"))
-    }
-  }
+  glatos_detections <- load_file(glatos_detections)
 
   # Now we have a dataframe we can start loading into an ATO object. Let's make an instance of the object.
   GLATOS_ATO <- new("ATO")
@@ -60,6 +49,7 @@ glatos_to_ato <- function(glatos_detections, glatos_receivers = "", glatos_tags 
   
   GLATOS_ATO <- add(GLATOS_ATO, dep)
   
+  #In the detection extract zip I had for reference there didn't seem to be a bespoke Tag metadata file. I'll leave this structure here in case we need to build it out further but I think it's only ever going to flop into the else. 
   if (glatos_tags != "") {
     tag <- ato_tag_from_glatos(glatos_tags, type = "meta")
 

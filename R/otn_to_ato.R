@@ -48,6 +48,7 @@ otn_to_ato <- function(otn_detections, otn_receivers = "", otn_tags = "") {
   # automatically try to derive receiver/tag metadata from the extract if no file is supplied.
   dep <- ""
   tag <- ""
+  ani <- "" #We don't have an "animals" file so this object will all have to be derived. 
 
   # In both cases, if a file is supplied, we'll make the metadata objects using the information therein;
   # otherwise, we'll attempt to make approximately correct receiver/tag metadata from only what's contained in
@@ -67,6 +68,7 @@ otn_to_ato <- function(otn_detections, otn_receivers = "", otn_tags = "") {
   }
 
   OTN_ATO <- add(OTN_ATO, tag)
+  
 
   return(OTN_ATO)
 }
