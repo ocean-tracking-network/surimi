@@ -68,6 +68,8 @@ otn_to_ato <- function(otn_detections, otn_receivers = "", otn_tags = "") {
   }
 
   OTN_ATO <- add(OTN_ATO, tag)
+  
+  
 
 
   return(OTN_ATO)
