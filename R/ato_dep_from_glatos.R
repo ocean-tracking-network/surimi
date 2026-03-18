@@ -19,13 +19,13 @@ ato_dep_from_glatos <- function(glatos_file, glatos_detection_data = "", type = 
       deploy_lat = glatos_data$deploy_lat,
       deploy_lon = glatos_data$deploy_long,
       deploy_z = glatos_data$bottom_depth,
-      recover_datetime = glatos_data$recover_date_time, #??? We might be able to get this from another part of the sheet
+      recover_datetime = glatos_data$recover_date_time, # ??? We might be able to get this from another part of the sheet
       recover_lat = glatos_data$recover_lat,
       recover_lon = glatos_data$recover_long,
-      transmitter = NA_character_, #???
-      transmitter_manufacturer = NA_character_, #???
-      transmitter_ping_rate = NA_character_, #???
-      transmitter_model = NA_character_, #???
+      transmitter = NA_character_, # ???
+      transmitter_manufacturer = NA_character_, # ???
+      transmitter_ping_rate = NA_character_, # ???
+      transmitter_model = NA_character_, # ???
       transmitter_serial = NA_integer_
     )
     return(dep)
