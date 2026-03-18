@@ -12,9 +12,7 @@ load_file <- function(input_file) {
       output_frame <- read.csv(input_file, na = c("", "null", "NA"))
     }
     return(output_frame)
-  }
-  else {
+  } else {
     return(input_file)
   }
-  
 }
