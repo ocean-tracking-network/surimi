@@ -1,10 +1,10 @@
 ato_dep_from_glatos <- function(glatos_file, glatos_detection_data = "", type = "meta") {
   # Read in the file we've been given if we haven't been handed a dataframe.
   glatos_data <- load_file(glatos_file)
-  
-  #Detection data is an optional pass-through but if we have it, we can join it to the receiver dataframe to get additional transmitter data. 
+
+  # Detection data is an optional pass-through but if we have it, we can join it to the receiver dataframe to get additional transmitter data.
   if (glatos_detection_data != "" && is.data.frame(glatos_detection_data)) {
-    #TODO: Join the two dataframes to get transmitter data passed through.
+    # TODO: Join the two dataframes to get transmitter data passed through.
   }
 
   # If we've been given a metadata file, we read it in as one.
@@ -16,7 +16,7 @@ ato_dep_from_glatos <- function(glatos_file, glatos_detection_data = "", type = 
       receiver_codeset = glatos_data$code_map,
       deploy_location = glatos_data$station,
       deploy_datetime = as.POSIXct(glatos_data$deploy_date_time),
-      tz = "UTC", 
+      tz = "UTC",
       deploy_lat = glatos_data$deploy_lat,
       deploy_lon = glatos_data$deploy_long,
       deploy_z = glatos_data$bottom_depth,
@@ -25,7 +25,7 @@ ato_dep_from_glatos <- function(glatos_file, glatos_detection_data = "", type = 
       recover_lon = glatos_data$recover_long,
       transmitter = NA_character_, # ???
       transmitter_manufacturer = NA_character_, # ???
-      transmitter_ping_rate = as.numeric(glatos_data$glatos_ins_frequency), #is this accurate? I think this mapping is right.
+      transmitter_ping_rate = as.numeric(glatos_data$glatos_ins_frequency), # is this accurate? I think this mapping is right.
       transmitter_model = NA_character_, # ???
       transmitter_serial = NA_integer_
     )
@@ -104,7 +104,7 @@ ato_dep_from_glatos <- function(glatos_file, glatos_detection_data = "", type = 
       recover_datetime = as.POSIXct(rcvr_grouped$maxDetectionDate),
       recover_lat = NA_real_,
       recover_lon = NA_real_,
-      transmitter = paste(rcvr_grouped$transmitter_codespace, "-", rcvr_grouped$transmitter_id, sep=""),
+      transmitter = paste(rcvr_grouped$transmitter_codespace, "-", rcvr_grouped$transmitter_id, sep = ""),
       transmitter_model = NA_character_,
       transmitter_serial = rcvr_grouped$transmitter_id,
       tz = "UTC"
