@@ -1,8 +1,8 @@
 ato_ani_from_otn <- function(otn_file) {
-  #Import the file we've got.
+  # Import the file we've got.
   otn_data <- load_file(otn_file)
-  
-  #OTN doesn't have a bespoke animal file so we'll take what we get from the tag file.
+
+  # OTN doesn't have a bespoke animal file so we'll take what we get from the tag file.
   ani <- make_ani(
     animal = otn_data$ANIMAL_ID,
     capture_location = otn_data$CAPTURE_LOCATION,
