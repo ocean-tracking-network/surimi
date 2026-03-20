@@ -63,6 +63,10 @@ otn_to_ato <- function(otn_detections, otn_receivers = "", otn_tags = "") {
 
   if (otn_tags != "") {
     tag <- ato_tag_from_otn(otn_tags, type = "meta")
+    #If we have a tag metadata file, we can derive an animal object; if we don't, there's hardly enough information to bother,
+    #and if people are so inclined they can add it manually through the ATO's default functions and ATools. 
+    ani <- ato_ani_from_otn(otn_tags)
+    OTN_ATO <- add(OTN_ATO, ani)
   } else {
     tag <- ato_tag_from_otn(otn_detections, type = "extract")
   }
