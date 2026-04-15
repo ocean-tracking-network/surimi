@@ -2,10 +2,9 @@
 ##'
 ##' @description Takes a GLATOS detection sheet and optionally receiver metadata and returns an ATO object.
 ##'
-##' @param otn_detections The dataframe containing detection information.
-##' @param otn_receivers The dataframe containing receiver information.
-##' @param otn_tags The dataframe containing tag information.
-##'
+##' @param glatos_detections The dataframe containing detection information.
+##' @param glatos_receivers The dataframe containing receiver information.
+##' 
 ##' @importFrom dplyr select '%>%' mutate rename group_by arrange distinct filter left_join
 ##' @importFrom tidyr unite
 ##' @importFrom lubridate ymd as_date
