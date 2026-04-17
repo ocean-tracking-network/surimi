@@ -20,4 +20,5 @@ Imports:
     lubridate,
     tidyr,
     worrms,
-    nanoparquet
+    nanoparquet,
+    glatos
