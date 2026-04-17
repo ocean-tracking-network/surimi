@@ -4,7 +4,7 @@
 ##'
 ##' @param glatos_detections The dataframe containing detection information.
 ##' @param glatos_receivers The dataframe containing receiver information.
-##' 
+##'
 ##' @importFrom dplyr select '%>%' mutate rename group_by arrange distinct filter left_join
 ##' @importFrom tidyr unite
 ##' @importFrom lubridate ymd as_date
