@@ -7,11 +7,9 @@
 glatos_to_ato(glatos_detections, glatos_receivers = "")
 }
 \arguments{
-\item{otn_detections}{The dataframe containing detection information.}
+\item{glatos_detections}{The dataframe containing detection information.}
 
-\item{otn_receivers}{The dataframe containing receiver information.}
-
-\item{otn_tags}{The dataframe containing tag information.}
+\item{glatos_receivers}{The dataframe containing receiver information.}
 }
 \value{
 Returns an ATO object.
