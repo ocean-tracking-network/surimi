@@ -27,13 +27,13 @@ glatos_workbook_to_ato <- function(glatos_workbook) {
   # Now that we have those, we can start casting info the same as we would with the glatos_to_ato function but with more tag info.
   GLATOS_ATO <- new("ATO")
 
-  # Start with det, as always.
+  # Start with det, as always- although GLATOS workbooks don't have detection data, it will help us down the road to populate and assign this anyway.
   det <- make_det(
-    datetime = as.POSIXct(glatos_detections$detection_timestamp_utc),
+    datetime = as.POSIXct(NA_real_),
     frac_second = NA_real_,
-    receiver_serial = as.integer(glatos_detections$receiver_sn),
-    transmitter = paste(glatos_detections$transmitter_codespace, "-", glatos_detections$transmitter_id, sep = ""), # Might have to synthesize this from other fields
-    sensor_value = as.numeric(glatos_detections$sensor_value),
+    receiver_serial = NA_character_,
+    transmitter = NA_character_,
+    sensor_value = as.numeric(NA_integer_),
     tz = "UTC"
   )
 

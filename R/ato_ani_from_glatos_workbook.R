@@ -5,7 +5,7 @@ ato_ani_from_glatos_workbook <- function(glatos_data) {
     capture_datetime = as.POSIXct(glatos_data$glatos_caught_date),
     capture_lat = glatos_data$capture_latitude,
     capture_lon = glatos_data$capture_longitude,
-    release_loaction = glatos_data$release_location,
+    release_location = glatos_data$release_location,
     release_datetime = as.POSIXct(glatos_data$utc_release_date_time),
     release_lat = glatos_data$release_latitude,
     release_lon = glatos_data$release_longitude,

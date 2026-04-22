@@ -8,7 +8,7 @@ ato_tag_from_glatos_workbook <- function(glatos_data) {
     serial = glatos_data$tag_serial_number,
     transmitter = paste(glatos_data$tag_code_space, "-", glatos_data$tag_id_code),
     activation_datetime = as.POSIXct(glatos_data$tag_activation_date),
-    battery_life = glatos_data$est_tag_life,
+    battery_life = as.numeric(glatos_data$est_tag_life),
     sensor_type = NA_character_, # ???
     sensor_unit = NA_character_, # ???
     animal = glatos_data$animal_id,

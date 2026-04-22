@@ -18,7 +18,7 @@ ato_dep_from_glatos_workbook <- function(glatos_data) {
     transmitter_manufacturer = NA_character_, # ???
     transmitter_ping_rate = as.numeric(glatos_data$glatos_ins_frequency), # is this accurate? I think this mapping is right.
     transmitter_model = NA_character_, # ???
-    transmitter_serial = NA_integer_
+    transmitter_serial = NA_character_
   )
   return(dep)
 }
