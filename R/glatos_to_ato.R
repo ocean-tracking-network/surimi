@@ -29,6 +29,9 @@ glatos_to_ato <- function(glatos_detections, glatos_receivers = "", glatos_workb
   
   #I know this rename might be a little confusing but since someone might optionally hand in a receiver metadata sheet, I have to use different wording so that they don't get mixed up. 
   glatos_deployments <- glatos_list$receivers
+  
+  #temporarily dealing with some NaN values while I test. 
+  glatos_deployments <- drop_na(glatos_deployments, recover_date_time)
 
   # Now we have a dataframe we can start loading into an ATO object. Let's make an instance of the object.
   GLATOS_ATO <- new("ATO")
@@ -43,7 +46,7 @@ glatos_to_ato <- function(glatos_detections, glatos_receivers = "", glatos_workb
     tz = "UTC"
   )
 
-  GLATOS_ATO <- add(GLATOS_ATO, det)
+  GLATOS_ATO <- set_det(GLATOS_ATO, det)
 
   # I used to have a 'derive' argument as in some of the original OTN-to-IMOS functions but then I realised it was safer to just
   # automatically try to derive receiver metadata from the extract if no file is supplied.
@@ -60,12 +63,16 @@ glatos_to_ato <- function(glatos_detections, glatos_receivers = "", glatos_workb
     dep <- ato_dep_from_glatos(glatos_detections, type = "extract")
   }
 
-  GLATOS_ATO <- add(GLATOS_ATO, dep)
+  GLATOS_ATO <- set_dep(GLATOS_ATO, dep)
 
   # Tag information is not part of what's distributed in glatos publications so we can't derive it, but if someone has their workbook handy, we can use that to get tag data.
   if(!is.null(glatos_animals)) {
     tag <- ato_tag_from_glatos_workbook(glatos_animals)
-    GLATOS_ATO <- add(GLATOS_ATO, tag)
+    GLATOS_ATO <- set_tag(GLATOS_ATO, tag)
+    
+    #We also need to create observations, which we can do from the glatos_animals information since it records whether or not the tag has been captured and recovered. 
+    obs <- ato_obs_from_glatos_workbook(glatos_animals)
+    GLATOS_ATO <- set_obs(GLATOS_ATO, obs)
   }
 
   #Finally we can get animal info from either the workbook, if provided, or partially from the detections themselves.
@@ -76,7 +83,7 @@ glatos_to_ato <- function(glatos_detections, glatos_receivers = "", glatos_workb
     ani <- ato_ani_from_glatos(glatos_detections)
   }
 
-  GLATOS_ATO <- add(GLATOS_ATO, ani)
+  GLATOS_ATO <- set_ani(GLATOS_ATO, ani)
 
   return(GLATOS_ATO)
 }

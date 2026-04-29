@@ -42,7 +42,7 @@ otn_to_ato <- function(otn_detections, otn_receivers = "", otn_tags = "") {
     tz = "UTC"
   )
 
-  OTN_ATO <- add(OTN_ATO, det)
+  OTN_ATO <- set_det(OTN_ATO, det)
 
   # I used to have a 'derive' argument as in some of the original OTN-to-IMOS functions but then I realised it was safer to just
   # automatically try to derive receiver/tag metadata from the extract if no file is supplied.
@@ -59,19 +59,19 @@ otn_to_ato <- function(otn_detections, otn_receivers = "", otn_tags = "") {
     dep <- ato_dep_from_otn(otn_detections, type = "extract")
   }
 
-  OTN_ATO <- add(OTN_ATO, dep)
+  OTN_ATO <- set_dep(OTN_ATO, dep)
 
   if (otn_tags != "") {
     tag <- ato_tag_from_otn(otn_tags, type = "meta")
     # If we have a tag metadata file, we can derive an animal object; if we don't, there's hardly enough information to bother,
     # and if people are so inclined they can add it manually through the ATO's default functions and ATools.
     ani <- ato_ani_from_otn(otn_tags)
-    OTN_ATO <- add(OTN_ATO, ani)
+    OTN_ATO <- set_ani(OTN_ATO, ani)
   } else {
     tag <- ato_tag_from_otn(otn_detections, type = "extract")
   }
 
-  OTN_ATO <- add(OTN_ATO, tag)
+  OTN_ATO <- set_tag(OTN_ATO, tag)
 
 
   return(OTN_ATO)
