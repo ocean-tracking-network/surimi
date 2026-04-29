@@ -4,7 +4,7 @@ ato_dep_from_glatos_workbook <- function(glatos_data) {
   dep <- make_dep(
     receiver_model = glatos_data$ins_model_no,
     receiver_serial = glatos_data$ins_serial_no,
-    # receiver_codeset = glatos_data$code_map,
+    receiver_codeset = NA_character_,
     deploy_location = glatos_data$station_no,
     deploy_datetime = as.POSIXct(glatos_data$deploy_date_time),
     tz = "UTC",
