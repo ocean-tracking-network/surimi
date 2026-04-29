@@ -30,7 +30,7 @@ otn_to_ato <- function(otn_detections, otn_receivers = "", otn_tags = "") {
   }
 
   # Now we have a dataframe we can start loading into an ATO object. Let's make an instance of the object.
-  OTN_ATO <- new("ATO")
+  OTN_ATO <- init_ato()
 
   # Make the "detections" object,
   det <- make_det(
