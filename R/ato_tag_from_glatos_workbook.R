@@ -8,7 +8,7 @@ ato_tag_from_glatos_workbook <- function(glatos_data) {
     ping_rate = NA_real_, # ???
     ping_variation = NA_real_, # ???
     serial = glatos_data_filtered$tag_serial_number,
-    transmitter = paste(glatos_data_filtered$tag_code_space, "-", glatos_data_filtered$tag_id_code),
+    transmitter = paste(glatos_data_filtered$tag_code_space, "-", glatos_data_filtered$tag_id_code, sep=""),
     activation_datetime = as.POSIXct(glatos_data_filtered$tag_activation_date),
     battery_life = as.numeric(glatos_data_filtered$est_tag_life),
     sensor_type = NA_character_, # ???
