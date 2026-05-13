@@ -111,6 +111,78 @@ ato_to_otn <- function(ato_object, dets=TRUE, rcvr=FALSE, tag=FALSE, output_fold
   
   if(tag == TRUE) {
     
+    colNames <- c(
+      "ANIMAL_ID",
+      "TAG_TYPE",
+      "TAG_MANUFACTURER", 
+      "TAG_MODEL", 
+      "TAG_SERIAL_NUMBER",
+      "TAG_ID_CODE", 
+      "TAG_CODE_SPACE",
+      "TAG_IMPLANT_TYPE",
+      "TAG_IMPLANT_METHOD", 
+      "TAG_ACTIVATION_DATE",
+      "EST_TAG_LIFE", 
+      "TAGGER", 
+      "TAG_OWNER_PI",
+      "TAG_OWNER_ORGANIZATION",
+      "COMMON_NAME_E", 
+      "SCIENTIFIC_NAME", 
+      "CAPTURE_LOCATION", 
+      "CAPTURE_LATITUDE", 
+      "CAPTURE_LONGITUDE", 
+      "WILD_OR_HATCHERY",
+      "STOCK", 
+      "LENGTH (m)",
+      "WEIGHT (kg)",
+      "LENGTH_TYPE", 
+      "LENGTH2(m)",
+      "LENGTH2_TYPE", 
+      "LIFE_STAGE",
+      "AGE", 
+      "AGE_UNITS", 
+      "SEX", 
+      "DNA_SAMPLE_TAKEN", 
+      "TREATMENT_TYPE", 
+      "RELEASE_GROUP", 
+      "RELEASE_LOCATION", 
+      "RELEASE_LATITUDE", 
+      "RELEASE_LONGITUDE",
+      "UTC_RELEASE_DATE_TIME",
+      "HARVEST_DATE", 
+      "CAPTURE_DEPTH(m)",
+      "TEMPERATURE_CHANGE (degrees C)",
+      "HOLDING_TEMPERATURE (degrees C)",
+      "PREOP_HOLD_PERIOD",
+      "POSTOP_HOLD_PERIOD", 
+      "SURGERY_LOCATION", 
+      "DATE_OF_SURGERY",
+      "SURGERY_LATITUDE", 
+      "SURGERY_LONGITUDE", 
+      "SEDATIVE", 
+      "SEDATIVE_CONCENTRATION (ppm)",
+      "ANAESTHETIC", 
+      "BUFFER", 
+      "ANAESTHETIC_CONCENTRATION (ppm)",
+      "BUFFER_CONCENTRATION_IN_ANAESTHETIC (ppm)",
+      "ANAESTHETIC_CONCENTRATION_IN_RECIRCULATION (ppm)",
+      "BUFFER_CONCENTRATION_IN_RECIRCULATION (ppm)", 
+      "DISSOLVED_OXYGEN (ppm)",
+      "COMMENTS"
+    )
+    
+    tag_df <- data.frame(matrix(ncol=length(colNames), nrow=nrow(ato_tags)))
+    
+    #We'll start by pulling over what data we can from the tag object, though we may have to fold in data from @ani, which will take some matching and merging. But one thing at a time. 
+    tag_df$TAG_MANUFACTURER <- ato_tags$manufacturer
+    tag_df$TAG_MODEL <- ato_tags$model
+    tag_df$TAG_SERIAL_NUMBER <- ato_tags$serial
+    tag_df$TAG_ACTIVATION_DATE <- ato_tags$activation_datetime
+    tag_df$EST_TAG_LIFE <- ato_tags$battery_life
+    tag_df$RELEASE_LOCATION <- ato_tags$release_location
+    tag_df$UTC_RELEASE_DATE_TIME <- ato_tags$release_datetime
+    tag_df$RELEASE_LATITUDE <- ato_tags$release_latitude
+    tag_df$RELEASE_LONGITUDE <_ ato_tags$release_longitude
     
   }
   
