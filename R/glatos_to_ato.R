@@ -31,7 +31,7 @@ glatos_to_ato <- function(glatos_detections, glatos_receivers = "", glatos_workb
   glatos_deployments <- glatos_list$receivers
   
   #temporarily dealing with some NaN values while I test. 
-  glatos_deployments <- drop_na(glatos_deployments, recover_date_time)
+  glatos_deployments <- drop_na(glatos_deployments, any_of(c("recover_date_time", "deploy_date_time")))
 
   # Now we have a dataframe we can start loading into an ATO object. Let's make an instance of the object.
   GLATOS_ATO <- init_ato()

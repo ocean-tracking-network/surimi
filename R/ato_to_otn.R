@@ -17,7 +17,7 @@ ato_to_otn <- function(ato_object, dets=TRUE, rcvr=FALSE, tag=FALSE, output_fold
     
     #We're going to export data from the ATO so as to create an OTN detection extract (or equivalent approximation). 
     #Start by instantiating a dataframe with the appropriate column names. 
-    det_df <- data.frame(matrix(ncol=29, nrow=0))
+    det_df <- data.frame(matrix(ncol=29, nrow=nrow(ato_dets)))
     
     colnames(det_df) <- c(
       "collectionCode",
@@ -48,7 +48,7 @@ ato_to_otn <- function(ato_object, dets=TRUE, rcvr=FALSE, tag=FALSE, output_fold
       "citation", 
       "unqDetecID", 
       "contactPOC", 
-      "contactPI",
+      "contactPI"
     )
     
     #Now we need to get the data that we can get out of the ATO. We can start with the data in @det, which will be our point of reference for everything else. 
@@ -58,6 +58,8 @@ ato_to_otn <- function(ato_object, dets=TRUE, rcvr=FALSE, tag=FALSE, output_fold
     det_df$receiver <- ato_dets$receiver_serial
     det_df$tagName <- ato_dets$transmitter
     det_df$sensorValue <- ato_dets$sensor_value
+    
+    write.csv(det_df, paste(output_folder, "/surimi_output_det.csv", sep=""))
   }
   
   if(rcvr == TRUE) {
@@ -104,7 +106,7 @@ ato_to_otn <- function(ato_object, dets=TRUE, rcvr=FALSE, tag=FALSE, output_fold
     rcvr_df$TRANSMITTER <- ato_deps$transmitter
     rcvr_df$TRANSMIT_MODEL <- ato_deps$transmitter_model
     
-    write.csv(rcvr_df, paste(output_folder, "/ato_csv_output.csv", sep=""))
+    write.csv(rcvr_df, paste(output_folder, "/surimi_output_rcvr.csv", sep=""))
   }
   
   if(tag == TRUE) {
@@ -180,7 +182,7 @@ ato_to_otn <- function(ato_object, dets=TRUE, rcvr=FALSE, tag=FALSE, output_fold
     tag_df$RELEASE_LOCATION <- ato_tags$release_location
     tag_df$UTC_RELEASE_DATE_TIME <- ato_tags$release_datetime
     tag_df$RELEASE_LATITUDE <- ato_tags$release_latitude
-    tag_df$RELEASE_LONGITUDE <_ ato_tags$release_longitude
+    tag_df$RELEASE_LONGITUDE <- ato_tags$release_longitude
     
   }
   

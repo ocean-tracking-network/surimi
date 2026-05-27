@@ -1,9 +1,6 @@
 ato_dep_from_glatos_workbook <- function(glatos_data) {
   # This implementation is fairly straightforward- if we have been given a glatos workbook, then we simply load it in- there are no optional file inclusions.
   
-  #We may end up with a situation where we have no deploy_date_time, but we do have glatos_deploy_date_time, which is the deploy_date_time but in the local time zone at the deployment location (specified by GLATOS_TIMEZONE).
-  #So we're going to convert the GLATOS_DEPLOY_DATE_TIME to UTC and then coalesce it with the deploy_date_time, thereby overwriting null deploy_date_times with converted glatos_deploy_date_times. 
-
   dep <- make_dep(
     receiver_model = glatos_data$ins_model_no,
     receiver_serial = glatos_data$ins_serial_no,

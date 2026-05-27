@@ -32,11 +32,16 @@ otn_to_ato <- function(otn_detections, otn_receivers = "", otn_tags = "") {
   # Now we have a dataframe we can start loading into an ATO object. Let's make an instance of the object.
   OTN_ATO <- init_ato()
 
-  # Make the "detections" object,
+  # Make the "detections" object.
+  
+  #Filter out releases.
+  #otn_detections_filtered <- dplyr::filter(otn_detections, otn_detections$receiver != "release")
+  #View(otn_detections_filtered)
+  
   det <- make_det(
     datetime = as.POSIXct(otn_detections$dateCollectedUTC),
     frac_second = NA_real_,
-    receiver_serial = as.integer(otn_detections$receiver),
+    receiver_serial = as.character(otn_detections$receiver),
     transmitter = otn_detections$tagName,
     sensor_value = as.numeric(otn_detections$sensorValue),
     tz = "UTC"
