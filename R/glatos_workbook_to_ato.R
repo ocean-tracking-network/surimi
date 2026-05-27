@@ -25,29 +25,32 @@ glatos_workbook_to_ato <- function(glatos_workbook) {
   glatos_receivers <- glatos_list$receivers
 
   # Now that we have those, we can start casting info the same as we would with the glatos_to_ato function but with more tag info.
-  GLATOS_ATO <- new("ATO")
+  GLATOS_ATO <- init_ato()
 
   # Start with det, as always- although GLATOS workbooks don't have detection data, it will help us down the road to populate and assign this anyway.
   det <- make_det(
-    datetime = as.POSIXct(NA_real_),
+    datetime = as.POSIXct(Sys.Date()),
     frac_second = NA_real_,
-    receiver_serial = NA_character_,
-    transmitter = NA_character_,
+    receiver_serial = "workbook-generated",
+    transmitter = "workbook-generated",
     sensor_value = as.numeric(NA_integer_),
     tz = "UTC"
   )
 
-  GLATOS_ATO <- add(GLATOS_ATO, det)
+  GLATOS_ATO <- set_det(GLATOS_ATO, det)
 
   # There's only one file to supply, so we don't need to have the optional part here like in the other functions.
   dep <- ato_dep_from_glatos_workbook(glatos_receivers)
-  GLATOS_ATO <- add(GLATOS_ATO, dep)
+  GLATOS_ATO <- set_dep(GLATOS_ATO, dep)
 
   tag <- ato_tag_from_glatos_workbook(glatos_animals)
-  GLATOS_ATO <- add(GLATOS_ATO, tag)
+  GLATOS_ATO <- set_tag(GLATOS_ATO, tag)
 
   ani <- ato_ani_from_glatos_workbook(glatos_animals)
-  GLATOS_ATO <- add(GLATOS_ATO, ani)
+  GLATOS_ATO <- set_ani(GLATOS_ATO, ani)
+  
+  obs <- ato_obs_from_glatos_workbook(glatos_animals)
+  GLATOS_ATO <- set_obs(GLATOS_ATO, obs)
 
   return(GLATOS_ATO)
 }

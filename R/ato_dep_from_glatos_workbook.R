@@ -1,6 +1,6 @@
 ato_dep_from_glatos_workbook <- function(glatos_data) {
   # This implementation is fairly straightforward- if we have been given a glatos workbook, then we simply load it in- there are no optional file inclusions.
-
+  
   dep <- make_dep(
     receiver_model = glatos_data$ins_model_no,
     receiver_serial = glatos_data$ins_serial_no,
