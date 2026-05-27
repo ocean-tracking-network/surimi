@@ -11,8 +11,6 @@ ato_to_otn <- function(ato_object, dets=TRUE, rcvr=FALSE, tag=FALSE, output_fold
   #We'll join the above as appropriate when constructing each of the potential pieces below. 
   #We'll do each one individually so as to cover off instances where one but not the other are needed. 
   
-  #(Note to self- I am starting with just the receiver one in the hopes that it'll be a simpler build; it will also get to the quick of something Dan was wondering about.)
-  
   if(dets == TRUE) {
     
     
