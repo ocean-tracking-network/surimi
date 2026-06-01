@@ -21,17 +21,21 @@ ato_ani_from_otn <- function(otn_file, type = "meta") {
   
   #If we're dealing with just a detection extract, the ani object will be pretty sparse, but creating it will preserve data. 
   else if(type == "extract") {
-   ani <- make_ani(
-     animal = otn_data$organismID,
-     capture_location = NA_character_,
-     capture_datetime = as.POSIXct(NA_real_),
-     capture_lat = NA_real_,
-     capture_lon = NA_real_,
-     release_location = NA_real_,
-     release_datetime = as.POSIXct(NA_real_),
-     release_lat = NA_real_,
-     release_lon = NA_real_,
-     tz = "UTC"
+    #We'll use the releases from the detection extract as our info for the animals.
+    
+    releases <- filter(otn_data, receiver == "release")
+    
+    ani <- make_ani(
+      animal = releases$organismID,
+      capture_location = NA_character_,
+      capture_datetime = as.POSIXct(NA_real_),
+      capture_lat = NA_real_,
+      capture_lon = NA_real_,
+      release_location = releases$localArea,
+      release_datetime = as.POSIXct(releases$dateCollectedUTC),
+      release_lat = releases$decimalLatitude,
+      release_lon = releases$decimalLongitude,
+      tz = "UTC"
    ) 
   }
 }

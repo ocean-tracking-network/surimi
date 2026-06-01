@@ -27,7 +27,7 @@ ato_to_otn <- function(ato_object, dets=TRUE, rcvr=FALSE, tag=FALSE, output_fold
       "bottomDepth", 
       "receiverDepth", #Comes in from dep object (joined)
       "tagName", #comes in from the det object.
-      "codeSpace",
+      "codeSpace", #Comes in via tag, splitting the tagName into tagID and codeSpace. 
       "sensorName", 
       "sensorRaw",
       "sensorType", 
@@ -35,8 +35,8 @@ ato_to_otn <- function(ato_object, dets=TRUE, rcvr=FALSE, tag=FALSE, output_fold
       "sensorUnit",
       "dateCollectedUTC", #Comes in from the det object. 
       "uncorrectedDateCollectedUTC", 
-      "decimalLongitude", 
-      "decimalLatitude", 
+      "decimalLongitude", #Comes in from the receiver object; if we know the appropriate receiver we can get the lat/lon
+      "decimalLatitude", #Ditto
       "geodeticDatum", 
       "geometry", 
       "localArea", 
@@ -49,13 +49,18 @@ ato_to_otn <- function(ato_object, dets=TRUE, rcvr=FALSE, tag=FALSE, output_fold
     det_df <- data.frame(matrix(ncol=length(det_colnames), nrow=nrow(ato_dets)))
     colnames(det_df) <- det_colnames
     
-    #We're going to join tag to det on 'transmitter', then we can join the result to ani on 'animal'. That will let us get more data in the resulting extract-like output.
-    ato_det_joined <- merge(ato_dets, ato_tags, by="transmitter")
-    View(ato_det_joined)
-    ato_det_joined <- merge(ato_det_joined, ato_anis, by="animal")
-    ato_det_joined <- merge(ato_det_joined, ato_deps, by="receiver_serial", suffixes=c("_from_det", "_from_dep"))
+    #View(ato_dets)
+    #View(ato_deps)
     
+    #We're going to join tag to det on 'transmitter', then we can join the result to ani on 'animal'. That will let us get more data in the resulting extract-like output.
+    ato_det_joined <- merge(ato_dets, ato_tags, by="transmitter", all.x = TRUE, suffixes=c("_from_det", "_from_tag"))
+    ato_det_joined <- separate_wider_delim(ato_det_joined, cols=transmitter, delim="-", names = c("codespace_1", "codespace_2", "tagID"))
+    
+    ato_det_joined <- merge(ato_det_joined, ato_deps, by="receiver_serial", suffixes=c("_from_det", "_from_dep"), all.x = TRUE)
     #View(ato_det_joined)
+    ato_det_joined <- merge(ato_det_joined, ato_anis, by="animal", all.x = TRUE, suffixes=c("_from_det", "_from_ani"))
+    
+    View(ato_det_joined)
     
     det_df$collectionCode <- collectioncode
     det_df$organismID <- ato_det_joined$animal
@@ -63,6 +68,9 @@ ato_to_otn <- function(ato_object, dets=TRUE, rcvr=FALSE, tag=FALSE, output_fold
     det_df$receiver <- ato_det_joined$receiver_serial
     det_df$receiverDepth <- ato_det_joined$deploy_z
     det_df$tagName <- ato_det_joined$transmitter
+    det_df$codeSpace <- paste(ato_det_joined$codespace_1, "-", ato_det_joined$codespace_2, sep="")
+    det_df$decimalLongitude <- ato_det_joined$deploy_lon
+    det_df$decimalLatitude <- ato_det_joined$deploy_lat
     det_df$sensorValue <- ato_det_joined$sensor_value
     
     write.csv(det_df, paste(output_folder, "/surimi_output_det.csv", sep=""))
