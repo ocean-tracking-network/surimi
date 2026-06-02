@@ -57,10 +57,7 @@ ato_to_otn <- function(ato_object, dets=TRUE, rcvr=FALSE, tag=FALSE, output_fold
     ato_det_joined <- separate_wider_delim(ato_det_joined, cols=transmitter, delim="-", names = c("codespace_1", "codespace_2", "tagID"))
     
     ato_det_joined <- merge(ato_det_joined, ato_deps, by="receiver_serial", suffixes=c("_from_det", "_from_dep"), all.x = TRUE)
-    #View(ato_det_joined)
-    ato_det_joined <- merge(ato_det_joined, ato_anis, by="animal", all.x = TRUE, suffixes=c("_from_det", "_from_ani"))
-    
-    View(ato_det_joined)
+    ato_det_joined <- merge(ato_det_joined, ato_anis, by.x="animal_from_det", by.y="animal", all.x = TRUE, suffixes=c("_from_det", "_from_ani"))
     
     det_df$collectionCode <- collectioncode
     det_df$organismID <- ato_det_joined$animal

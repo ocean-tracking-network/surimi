@@ -71,14 +71,14 @@ otn_to_ato <- function(otn_detections, otn_receivers = "", otn_tags = "") {
     # If we have a tag metadata file, we can derive an animal object; if we don't, there's hardly enough information to bother,
     # and if people are so inclined they can add it manually through the ATO's default functions and ATools.
     ani <- ato_ani_from_otn(otn_tags)
-    OTN_ATO <- set_ani(OTN_ATO, ani)
   } else {
     tag <- ato_tag_from_otn(otn_detections, type = "extract")
     #Commenting this out while I figure out whether I can use releases from the extract to get mandatory data.
-    #ani <- ato_ani_from_otn(otn_detections, type = "extract")
+    ani <- ato_ani_from_otn(otn_detections, type = "extract")
   }
 
   OTN_ATO <- set_tag(OTN_ATO, tag)
+  OTN_ATO <- set_ani(OTN_ATO, ani)
 
 
   return(OTN_ATO)
