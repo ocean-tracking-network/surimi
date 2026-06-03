@@ -49,15 +49,14 @@ ato_to_otn <- function(ato_object, dets=TRUE, rcvr=FALSE, tag=FALSE, output_fold
     det_df <- data.frame(matrix(ncol=length(det_colnames), nrow=nrow(ato_dets)))
     colnames(det_df) <- det_colnames
     
-    #View(ato_dets)
-    #View(ato_deps)
-    
     #We're going to join tag to det on 'transmitter', then we can join the result to ani on 'animal'. That will let us get more data in the resulting extract-like output.
-    ato_det_joined <- merge(ato_dets, ato_tags, by="transmitter", all.x = TRUE, suffixes=c("_from_det", "_from_tag"))
+    ato_det_joined <- cbind(ato_dets, ato_tags[ato_dets$tag_match, !colnames(ato_tags) %in% c("transmitter", "valid", "ani_match", "animal")])
     ato_det_joined <- separate_wider_delim(ato_det_joined, cols=transmitter, delim="-", names = c("codespace_1", "codespace_2", "tagID"))
     
-    ato_det_joined <- merge(ato_det_joined, ato_deps, by="receiver_serial", suffixes=c("_from_det", "_from_dep"), all.x = TRUE)
-    ato_det_joined <- merge(ato_det_joined, ato_anis, by.x="animal_from_det", by.y="animal", all.x = TRUE, suffixes=c("_from_det", "_from_ani"))
+    ato_det_joined <- cbind(ato_det_joined, ato_deps[ato_det_joined$dep_match, ])
+    #ato_det_joined <- data.table::merge.data.table(ato_det_joined, ato_deps, by="receiver_serial", suffixes=c("_from_det", "_from_dep"), all.x = TRUE)
+    
+    ato_det_joined <- cbind(ato_det_joined, ato_anis[ato_det_joined$ani_match, ])
     
     det_df$collectionCode <- collectioncode
     det_df$organismID <- ato_det_joined$animal

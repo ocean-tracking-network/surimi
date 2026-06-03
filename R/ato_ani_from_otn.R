@@ -24,17 +24,27 @@ ato_ani_from_otn <- function(otn_file, type = "meta") {
     #We'll use the releases from the detection extract as our info for the animals.
     
     releases <- filter(otn_data, receiver == "release")
+    releases$dateCollectedUTC <- as.POSIXct(releases$dateCollectedUTC)
+    
+    aux <- split(releases, releases$organismID)
+    
+    recipient <- lapply(aux, function(x) {
+      x <- x[order(x$dateCollectedUTC), ]
+      return(x[1, ])
+    })
+    
+    aux <- do.call(rbind, recipient)
     
     ani <- make_ani(
-      animal = releases$organismID,
+      animal = aux$organismID,
       capture_location = NA_character_,
       capture_datetime = as.POSIXct(NA_real_),
       capture_lat = NA_real_,
       capture_lon = NA_real_,
-      release_location = releases$localArea,
-      release_datetime = as.POSIXct(releases$dateCollectedUTC),
-      release_lat = releases$decimalLatitude,
-      release_lon = releases$decimalLongitude,
+      release_location = aux$localArea,
+      release_datetime = aux$dateCollectedUTC,
+      release_lat = aux$decimalLatitude,
+      release_lon = aux$decimalLongitude,
       tz = "UTC"
    ) 
   }

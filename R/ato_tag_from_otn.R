@@ -47,9 +47,6 @@ ato_tag_from_otn <- function(otn_file, type = "meta") {
       group_by(catalogNumber) %>%
       distinct(catalogNumber, .keep_all = TRUE)
 
-    message("Number of releases:")
-    message(nrow(releases))
-
     tag <- distinctTag %>%
       select(
         collectionCode,
@@ -58,7 +55,8 @@ ato_tag_from_otn <- function(otn_file, type = "meta") {
         scientificName,
         decimalLongitude,
         decimalLatitude,
-        catalogNumber
+        catalogNumber,
+        organismID
       )
     # Now we can join the releases to get the appropriate transmitter_deployment_lat/lon
     tag <- left_join(tag,
@@ -74,6 +72,8 @@ ato_tag_from_otn <- function(otn_file, type = "meta") {
 
     tag <- as.data.frame(tag)
 
+    #View(tag)
+    
     tag_return <- make_tag(
       manufacturer = NA_character_,
       model = NA_character_,
@@ -86,7 +86,7 @@ ato_tag_from_otn <- function(otn_file, type = "meta") {
       battery_life = NA_real_,
       sensor_type = NA_character_, # ???
       sensor_unit = NA_character_, # ???
-      animal = NA_character_,
+      animal = tag$organismID,
       tz = "UTC"
     )
 

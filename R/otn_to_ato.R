@@ -29,31 +29,21 @@ otn_to_ato <- function(otn_detections, otn_receivers = "", otn_tags = "") {
     }
   }
 
-  # Now we have a dataframe we can start loading into an ATO object. Let's make an instance of the object.
-  OTN_ATO <- init_ato()
 
   # Make the "detections" object.
   
   #Filter out releases.
-  #otn_detections_filtered <- dplyr::filter(otn_detections, otn_detections$receiver != "release")
+  otn_detections_filtered <- dplyr::filter(otn_detections, otn_detections$receiver != "release")
   #View(otn_detections_filtered)
   
   det <- make_det(
-    datetime = as.POSIXct(otn_detections$dateCollectedUTC),
+    datetime = as.POSIXct(otn_detections_filtered$dateCollectedUTC),
     frac_second = NA_real_,
-    receiver_serial = as.character(otn_detections$receiver),
-    transmitter = otn_detections$tagName,
-    sensor_value = as.numeric(otn_detections$sensorValue),
+    receiver_serial = as.character(otn_detections_filtered$receiver),
+    transmitter = otn_detections_filtered$tagName,
+    sensor_value = as.numeric(otn_detections_filtered$sensorValue),
     tz = "UTC"
   )
-
-  OTN_ATO <- set_det(OTN_ATO, det)
-
-  # I used to have a 'derive' argument as in some of the original OTN-to-IMOS functions but then I realised it was safer to just
-  # automatically try to derive receiver/tag metadata from the extract if no file is supplied.
-  dep <- ""
-  tag <- ""
-  ani <- "" # We don't have an "animals" file so this object will all have to be derived.
 
   # In both cases, if a file is supplied, we'll make the metadata objects using the information therein;
   # otherwise, we'll attempt to make approximately correct receiver/tag metadata from only what's contained in
@@ -64,8 +54,6 @@ otn_to_ato <- function(otn_detections, otn_receivers = "", otn_tags = "") {
     dep <- ato_dep_from_otn(otn_detections, type = "extract")
   }
 
-  OTN_ATO <- set_dep(OTN_ATO, dep)
-
   if (otn_tags != "") {
     tag <- ato_tag_from_otn(otn_tags, type = "meta")
     # If we have a tag metadata file, we can derive an animal object; if we don't, there's hardly enough information to bother,
@@ -73,13 +61,15 @@ otn_to_ato <- function(otn_detections, otn_receivers = "", otn_tags = "") {
     ani <- ato_ani_from_otn(otn_tags)
   } else {
     tag <- ato_tag_from_otn(otn_detections, type = "extract")
-    #Commenting this out while I figure out whether I can use releases from the extract to get mandatory data.
     ani <- ato_ani_from_otn(otn_detections, type = "extract")
   }
 
-  OTN_ATO <- set_tag(OTN_ATO, tag)
-  OTN_ATO <- set_ani(OTN_ATO, ani)
-
+  OTN_ATO <- init_ato(
+    det = det,
+    dep = dep,
+    ani = ani,
+    tag = tag
+  )
 
   return(OTN_ATO)
 }
