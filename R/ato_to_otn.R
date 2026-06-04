@@ -46,17 +46,44 @@ ato_to_otn <- function(ato_object, dets=TRUE, rcvr=FALSE, tag=FALSE, output_fold
       "contactPI"
     )
     
-    det_df <- data.frame(matrix(ncol=length(det_colnames), nrow=nrow(ato_dets)))
-    colnames(det_df) <- det_colnames
+    #Since we remove the releases in the process of making the detection object, we need to re-add them when we export. 
+    #Everything in animals is made from a release anyway, so we have a 1:1 animals-to-releases relationship, we just need to create a
+    #release record for each animal. Following code written up by Hugo Flavio. 
+
+    link <- match(ato_anis$animal, ato_tags$animal)
     
-    #We're going to join tag to det on 'transmitter', then we can join the result to ani on 'animal'. That will let us get more data in the resulting extract-like output.
-    ato_det_joined <- cbind(ato_dets, ato_tags[ato_dets$tag_match, !colnames(ato_tags) %in% c("transmitter", "valid", "ani_match", "animal")])
+    ato_anis$transmitter <- ato_tags$transmitter[link]
+    
+    releases <- det(ato_object)
+    releases[1:nrow(ato_anis), ] <- NA
+    releases <- releases[1:nrow(ato_anis), ]
+    
+    releases$datetime <- ato_anis$release_datetime
+    releases$animal <- ato_anis$animal
+    releases$receiver_serial <- "release"
+    releases$transmitter <- ato_anis$transmitter
+    #This line is a bit weird but to make sure we match properly later, we need the ani_match column. Since each release naturally maps
+    #to the row by which it's represented in the animals object, this should work.
+    releases$ani_match <- as.numeric(rownames(ato_anis))
+    #releases$decimalLatitude <- ato_anis$release_lat
+    #releases$decimalLongitude <- ato_anis$release_lon
+    
+    
+    ato_det_joined <- rbind(det(ato_object), releases)
+    
+    #We're going to use the internal matching columns to link everything together on the way back in.
+    ato_det_joined <- cbind(ato_det_joined, ato_tags[ato_det_joined$tag_match, !colnames(ato_tags) %in% c("transmitter", "valid", "ani_match", "animal")])
     ato_det_joined <- separate_wider_delim(ato_det_joined, cols=transmitter, delim="-", names = c("codespace_1", "codespace_2", "tagID"))
     
     ato_det_joined <- cbind(ato_det_joined, ato_deps[ato_det_joined$dep_match, ])
-    #ato_det_joined <- data.table::merge.data.table(ato_det_joined, ato_deps, by="receiver_serial", suffixes=c("_from_det", "_from_dep"), all.x = TRUE)
     
     ato_det_joined <- cbind(ato_det_joined, ato_anis[ato_det_joined$ani_match, ])
+    
+    #View(ato_det_joined)
+    
+    #We're going to instantiate our dataframe here since we'll end up needing to key off the number of rows after this join. 
+    det_df <- data.frame(matrix(ncol=length(det_colnames), nrow=nrow(ato_det_joined)))
+    colnames(det_df) <- det_colnames
     
     det_df$collectionCode <- collectioncode
     det_df$organismID <- ato_det_joined$animal
