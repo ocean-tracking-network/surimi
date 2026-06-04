@@ -1,4 +1,4 @@
-ato_to_otn <- function(ato_object, dets=TRUE, rcvr=FALSE, tag=FALSE, output_folder = ".") {
+ato_to_otn <- function(ato_object, dets=TRUE, rcvr=FALSE, tag=FALSE, output_folder = ".", collectioncode = "") {
   #We need to perform the creation operations in reverse- take what data we can out of the ATO and put it into dataframes, which we then write to spreadsheets. That means that we're going to need to rejoin a lot
   #of the ATO data into a single dataframe so that the data will be properly aligned across the rows. 
   
@@ -12,27 +12,22 @@ ato_to_otn <- function(ato_object, dets=TRUE, rcvr=FALSE, tag=FALSE, output_fold
   #We'll do each one individually so as to cover off instances where one but not the other are needed. 
   
   if(dets == TRUE) {
-    
-    
-    
     #We're going to export data from the ATO so as to create an OTN detection extract (or equivalent approximation). 
     #Start by instantiating a dataframe with the appropriate column names. 
-    det_df <- data.frame(matrix(ncol=29, nrow=nrow(ato_dets)))
-    
-    colnames(det_df) <- c(
-      "collectionCode",
+    det_colnames <- c(
+      "collectionCode", #Supplied by parameter
       "catalogNumber", 
-      "organismID",
+      "organismID", #'animal' from ato_anis (joined)
       "scientificName",
       "commonName",
       "dateLastModified", 
       "detectedBy", 
       "station", 
       "receiver", #Comes in from the det object.
-      "bottomDepth",
-      "receiverDepth", 
+      "bottomDepth", 
+      "receiverDepth", #Comes in from dep object (joined)
       "tagName", #comes in from the det object.
-      "codeSpace",
+      "codeSpace", #Comes in via tag, splitting the tagName into tagID and codeSpace. 
       "sensorName", 
       "sensorRaw",
       "sensorType", 
@@ -40,8 +35,8 @@ ato_to_otn <- function(ato_object, dets=TRUE, rcvr=FALSE, tag=FALSE, output_fold
       "sensorUnit",
       "dateCollectedUTC", #Comes in from the det object. 
       "uncorrectedDateCollectedUTC", 
-      "decimalLongitude", 
-      "decimalLatitude", 
+      "decimalLongitude", #Comes in from the receiver object; if we know the appropriate receiver we can get the lat/lon
+      "decimalLatitude", #Ditto
       "geodeticDatum", 
       "geometry", 
       "localArea", 
@@ -51,21 +46,61 @@ ato_to_otn <- function(ato_object, dets=TRUE, rcvr=FALSE, tag=FALSE, output_fold
       "contactPI"
     )
     
-    #Now we need to get the data that we can get out of the ATO. We can start with the data in @det, which will be our point of reference for everything else. 
-    ato_dets <- ato_object@det
+    #Since we remove the releases in the process of making the detection object, we need to re-add them when we export. 
+    #Everything in animals is made from a release anyway, so we have a 1:1 animals-to-releases relationship, we just need to create a
+    #release record for each animal. Following code written up by Hugo Flavio. 
+
+    link <- match(ato_anis$animal, ato_tags$animal)
     
-    det_df$dateCollectedUTC <- ato_dets$datetime
-    det_df$receiver <- ato_dets$receiver_serial
-    det_df$tagName <- ato_dets$transmitter
-    det_df$sensorValue <- ato_dets$sensor_value
+    ato_anis$transmitter <- ato_tags$transmitter[link]
+    
+    releases <- det(ato_object)
+    releases[1:nrow(ato_anis), ] <- NA
+    releases <- releases[1:nrow(ato_anis), ]
+    
+    releases$datetime <- ato_anis$release_datetime
+    releases$animal <- ato_anis$animal
+    releases$receiver_serial <- "release"
+    releases$transmitter <- ato_anis$transmitter
+    #This line is a bit weird but to make sure we match properly later, we need the ani_match column. Since each release naturally maps
+    #to the row by which it's represented in the animals object, this should work.
+    releases$ani_match <- as.numeric(rownames(ato_anis))
+    #releases$decimalLatitude <- ato_anis$release_lat
+    #releases$decimalLongitude <- ato_anis$release_lon
+    
+    
+    ato_det_joined <- rbind(det(ato_object), releases)
+    
+    #We're going to use the internal matching columns to link everything together on the way back in.
+    ato_det_joined <- cbind(ato_det_joined, ato_tags[ato_det_joined$tag_match, !colnames(ato_tags) %in% c("transmitter", "valid", "ani_match", "animal")])
+    ato_det_joined <- separate_wider_delim(ato_det_joined, cols=transmitter, delim="-", names = c("codespace_1", "codespace_2", "tagID"))
+    
+    ato_det_joined <- cbind(ato_det_joined, ato_deps[ato_det_joined$dep_match, ])
+    
+    ato_det_joined <- cbind(ato_det_joined, ato_anis[ato_det_joined$ani_match, ])
+    
+    #View(ato_det_joined)
+    
+    #We're going to instantiate our dataframe here since we'll end up needing to key off the number of rows after this join. 
+    det_df <- data.frame(matrix(ncol=length(det_colnames), nrow=nrow(ato_det_joined)))
+    colnames(det_df) <- det_colnames
+    
+    det_df$collectionCode <- collectioncode
+    det_df$organismID <- ato_det_joined$animal
+    det_df$dateCollectedUTC <- ato_det_joined$datetime
+    det_df$receiver <- ato_det_joined$receiver_serial
+    det_df$receiverDepth <- ato_det_joined$deploy_z
+    det_df$tagName <- ato_det_joined$transmitter
+    det_df$codeSpace <- paste(ato_det_joined$codespace_1, "-", ato_det_joined$codespace_2, sep="")
+    det_df$decimalLongitude <- ato_det_joined$deploy_lon
+    det_df$decimalLatitude <- ato_det_joined$deploy_lat
+    det_df$sensorValue <- ato_det_joined$sensor_value
     
     write.csv(det_df, paste(output_folder, "/surimi_output_det.csv", sep=""))
   }
   
   if(rcvr == TRUE) {
-    rcvr_df <- data.frame(matrix(ncol=24, nrow=nrow(ato_deps)))
-    
-    colnames(rcvr_df) <- c(
+    rcvr_colnames <- c(
       "OTN_ARRAY",
       "STATION_NO", #Comes in from the deps object.
       "DEPLOY_DATE_TIME",#Comes in from the deps object.
@@ -92,6 +127,9 @@ ato_to_otn <- function(ato_object, dets=TRUE, rcvr=FALSE, tag=FALSE, output_fold
       "COMMENTS"
     )
     
+    rcvr_df <- data.frame(matrix(ncol=length(rcvr_colnames), nrow=nrow(ato_deps)))
+    colnames(rcvr_df) <- rcvr_colnames
+    
     rcvr_df$INS_MODEL_NO <- ato_deps$receiver_model
     rcvr_df$INS_SERIAL_NO <- ato_deps$receiver_serial
     rcvr_df$CODE_SET <- ato_deps$receiver_codeset
@@ -111,18 +149,18 @@ ato_to_otn <- function(ato_object, dets=TRUE, rcvr=FALSE, tag=FALSE, output_fold
   
   if(tag == TRUE) {
     
-    colNames <- c(
+    tag_colnames <- c(
       "ANIMAL_ID",
       "TAG_TYPE",
-      "TAG_MANUFACTURER", 
-      "TAG_MODEL", 
-      "TAG_SERIAL_NUMBER",
-      "TAG_ID_CODE", 
-      "TAG_CODE_SPACE",
+      "TAG_MANUFACTURER", #Comes in from the tag object
+      "TAG_MODEL", #Comes in from the tag object
+      "TAG_SERIAL_NUMBER", #Comes in from the tag object
+      "TAG_ID_CODE", #Comes in from the tag object, split out of transmitter
+      "TAG_CODE_SPACE", #Comes in from the tag object, split out of transmitter
       "TAG_IMPLANT_TYPE",
       "TAG_IMPLANT_METHOD", 
       "TAG_ACTIVATION_DATE",
-      "EST_TAG_LIFE", 
+      "EST_TAG_LIFE", #Comes in from the tag object as battery_life
       "TAGGER", 
       "TAG_OWNER_PI",
       "TAG_OWNER_ORGANIZATION",
@@ -171,12 +209,18 @@ ato_to_otn <- function(ato_object, dets=TRUE, rcvr=FALSE, tag=FALSE, output_fold
       "COMMENTS"
     )
     
-    tag_df <- data.frame(matrix(ncol=length(colNames), nrow=nrow(ato_tags)))
+    tag_df <- data.frame(matrix(ncol=length(tag_colnames), nrow=nrow(ato_tags)))
+    colnames(tag_df) <- tag_colnames
+    
+    #We can get additional data by splitting up the transmitter into the code_space and tag ID code, essentially doing the reverse operation as at ingestion.
+    ato_tags <- separate_wider_delim(ato_tags, cols=transmitter, delim="-", names = c("codespace_1", "codespace_2", "tagID"))
     
     #We'll start by pulling over what data we can from the tag object, though we may have to fold in data from @ani, which will take some matching and merging. But one thing at a time. 
     tag_df$TAG_MANUFACTURER <- ato_tags$manufacturer
     tag_df$TAG_MODEL <- ato_tags$model
     tag_df$TAG_SERIAL_NUMBER <- ato_tags$serial
+    tag_df$TAG_ID_CODE <- ato_tags$tagID
+    tag_df$TAG_CODE_SPACE <- paste(ato_tags$codespace_1, "-", ato_tags$codespace_2, sep="")
     tag_df$TAG_ACTIVATION_DATE <- ato_tags$activation_datetime
     tag_df$EST_TAG_LIFE <- ato_tags$battery_life
     tag_df$RELEASE_LOCATION <- ato_tags$release_location
@@ -184,6 +228,7 @@ ato_to_otn <- function(ato_object, dets=TRUE, rcvr=FALSE, tag=FALSE, output_fold
     tag_df$RELEASE_LATITUDE <- ato_tags$release_latitude
     tag_df$RELEASE_LONGITUDE <- ato_tags$release_longitude
     
+    write.csv(tag_df, paste(output_folder, "/surimi_output_tag.csv", sep=""))
   }
   
   return(TRUE)
