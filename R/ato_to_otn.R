@@ -3,10 +3,10 @@ ato_to_otn <- function(ato_object, dets=TRUE, rcvr=FALSE, tag=FALSE, output_fold
   #of the ATO data into a single dataframe so that the data will be properly aligned across the rows. 
   
   #We'll start by extracting the most relevant data structures in the ATO. 
-  ato_dets <- ato_object@det
-  ato_deps <- ato_object@dep
-  ato_tags <- ato_object@tag
-  ato_anis <- ato_object@ani
+  ato_dets <- det(ato_object)
+  ato_deps <- dep(ato_object)
+  ato_tags <- tag(ato_object)
+  ato_anis <- ani(ato_object)
   
   #We'll join the above as appropriate when constructing each of the potential pieces below. 
   #We'll do each one individually so as to cover off instances where one but not the other are needed. 
@@ -49,27 +49,18 @@ ato_to_otn <- function(ato_object, dets=TRUE, rcvr=FALSE, tag=FALSE, output_fold
     #Since we remove the releases in the process of making the detection object, we need to re-add them when we export. 
     #Everything in animals is made from a release anyway, so we have a 1:1 animals-to-releases relationship, we just need to create a
     #release record for each animal. Following code written up by Hugo Flavio. 
-
-    link <- match(ato_anis$animal, ato_tags$animal)
+    releases_det <- det(ato_object)
+    releases_tag <- ato_tags[!is.na(ato_tags$animal), ]
     
-    ato_anis$transmitter <- ato_tags$transmitter[link]
+    releases_det[1:nrow(releases_tag), ] <- NA
+    releases_det <- releases_det[1:nrow(releases_tag), ]
     
-    releases <- det(ato_object)
-    releases[1:nrow(ato_anis), ] <- NA
-    releases <- releases[1:nrow(ato_anis), ]
+    releases_det$datetime <- releases_tag$release_datetime
+    releases_det$receiver_serial <- "release"
+    releases_det$transmitter <- releases_tag$transmitter
+    releases_det$animal <- releases_tag$animal
     
-    releases$datetime <- ato_anis$release_datetime
-    releases$animal <- ato_anis$animal
-    releases$receiver_serial <- "release"
-    releases$transmitter <- ato_anis$transmitter
-    #This line is a bit weird but to make sure we match properly later, we need the ani_match column. Since each release naturally maps
-    #to the row by which it's represented in the animals object, this should work.
-    releases$ani_match <- as.numeric(rownames(ato_anis))
-    #releases$decimalLatitude <- ato_anis$release_lat
-    #releases$decimalLongitude <- ato_anis$release_lon
-    
-    
-    ato_det_joined <- rbind(det(ato_object), releases)
+    ato_det_joined <- rbind(ato_dets, releases_det)
     
     #We're going to use the internal matching columns to link everything together on the way back in.
     ato_det_joined <- cbind(ato_det_joined, ato_tags[ato_det_joined$tag_match, !colnames(ato_tags) %in% c("transmitter", "valid", "ani_match", "animal")])
