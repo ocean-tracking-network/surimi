@@ -5,7 +5,6 @@ ato_ani_from_glatos <- function(glatos_file) {
   #Glatos detection data doesn't store releases the same way we do, i.e, each release having its own distinct row, but release/capture info is included in each detection, so we can narrow the table down to only unique animal IDs
   #and use that table.
   unique_animals <- distinct(glatos_data, animal_id, utc_release_date_time, .keep_all=TRUE)
-  View(unique_animals)
   
   # We don't really have the option here to get this from an 'animal metadata' file so we're always going to be deriving.
   ani <- make_ani(
