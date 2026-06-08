@@ -12,7 +12,7 @@ ato_dep_from_glatos <- function(glatos_file, glatos_detection_data = "", type = 
     # This we can pull directly from the metadata.
     dep <- make_dep(
       receiver_model = glatos_data$ins_model_no,
-      receiver_serial = glatos_data$ins_serial_no,
+      receiver_serial = as.character(glatos_data$ins_serial_no),
       receiver_codeset = glatos_data$code_map,
       deploy_location = glatos_data$station,
       deploy_datetime = as.POSIXct(glatos_data$deploy_date_time),
@@ -27,7 +27,7 @@ ato_dep_from_glatos <- function(glatos_file, glatos_detection_data = "", type = 
       transmitter_manufacturer = NA_character_, # ???
       transmitter_ping_rate = as.numeric(glatos_data$glatos_ins_frequency), # is this accurate? I think this mapping is right.
       transmitter_model = NA_character_, # ???
-      transmitter_serial = NA_integer_
+      transmitter_serial = NA_character_
     )
     return(dep)
   } else if (type == "extract") {
@@ -95,7 +95,7 @@ ato_dep_from_glatos <- function(glatos_file, glatos_detection_data = "", type = 
 
     dep <- make_dep(
       receiver_model = NA_character_,
-      receiver_serial = as.integer(rcvr_grouped$receiver_sn),
+      receiver_serial = as.character(rcvr_grouped$receiver_sn),
       receiver_codeset = NA_character_,
       deploy_location = rcvr_grouped$station,
       deploy_datetime = as.POSIXct(rcvr_grouped$minDetectionDate),
@@ -104,9 +104,12 @@ ato_dep_from_glatos <- function(glatos_file, glatos_detection_data = "", type = 
       recover_datetime = as.POSIXct(rcvr_grouped$maxDetectionDate),
       recover_lat = NA_real_,
       recover_lon = NA_real_,
-      transmitter = paste(rcvr_grouped$transmitter_codespace, "-", rcvr_grouped$transmitter_id, sep = ""),
+      #A mistake on my part, this info represents the TAG, not the potential transceiver.
+      #transmitter = paste(rcvr_grouped$transmitter_codespace, "-", rcvr_grouped$transmitter_id, sep = ""),
+      transmitter = NA_character_,
       transmitter_model = NA_character_,
-      transmitter_serial = rcvr_grouped$transmitter_id,
+      #transmitter_serial = as.character(rcvr_grouped$transmitter_id),
+      transmitter_serial = NA_character_,
       tz = "UTC"
     )
 
