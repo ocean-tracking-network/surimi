@@ -2,15 +2,15 @@ ato_tag_from_otn <- function(otn_file, type = "meta") {
   # Read in the file we've been given if we haven't been handed a dataframe.
   if (!is.data.frame(otn_file)) {
     # Grab the extension.
-    extension <- tools::file_ext(otn_detections)
+    extension <- tools::file_ext(otn_file)
     # If it's a parquet, read it in as one...
     if (extension == "parquet") {
-      otn_file <- read_parquet(otn_detections)
+      otn_file <- read_parquet(otn_file)
     } else if (extension == "xlsx" || extension == "xls") {
-      otn_file <- read_excel(otn_detections)
+      otn_file <- read_excel(otn_file)
     } else {
       # Otherwise bring it in as a CSV.
-      otn_file <- read.csv(otn_detections, na = c("", "null", "NA"))
+      otn_file <- read.csv(otn_file, na = c("", "null", "NA"))
     }
   }
 

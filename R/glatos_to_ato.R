@@ -19,23 +19,24 @@
 
 glatos_to_ato <- function(glatos_detections, glatos_receivers = "", glatos_workbook = "") {
   glatos_detections <- load_file(glatos_detections)
+  glatos_deployments <- NULL
+  glatos_animals <- NULL
   
   #If we have the workbook, load that into something we can use with the glatos reading functions.
   # First we'll read in the workbook using the glatos package. One day this functionality may live inside surimi, but not yet.
-  glatos_list <- read_glatos_workbook(glatos_workbook)
+  if(glatos_workbook != "") {
+    glatos_list <- read_glatos_workbook(glatos_workbook)
+    
+    # Now we have a list containing 'metadata', 'animals', and 'receivers.' We really only need animals and receivers, so we'll split it up and get those.
+    glatos_animals <- glatos_list$animals
+    
+    #I know this rename might be a little confusing but since someone might optionally hand in a receiver metadata sheet, I have to use different wording so that they don't get mixed up. 
+    glatos_deployments <- glatos_list$receivers
+    
+    #temporarily dealing with some NaN values while I test. 
+    glatos_deployments <- drop_na(glatos_deployments, any_of(c("recover_date_time", "deploy_date_time")))
+  }
   
-  # Now we have a list containing 'metadata', 'animals', and 'receivers.' We really only need animals and receivers, so we'll split it up and get those.
-  glatos_animals <- glatos_list$animals
-  
-  #I know this rename might be a little confusing but since someone might optionally hand in a receiver metadata sheet, I have to use different wording so that they don't get mixed up. 
-  glatos_deployments <- glatos_list$receivers
-  
-  #temporarily dealing with some NaN values while I test. 
-  glatos_deployments <- drop_na(glatos_deployments, any_of(c("recover_date_time", "deploy_date_time")))
-
-  # Now we have a dataframe we can start loading into an ATO object. Let's make an instance of the object.
-  GLATOS_ATO <- init_ato()
-
   # Make the "detections" object,
   det <- make_det(
     datetime = as.POSIXct(glatos_detections$detection_timestamp_utc),
@@ -45,8 +46,6 @@ glatos_to_ato <- function(glatos_detections, glatos_receivers = "", glatos_workb
     sensor_value = as.numeric(glatos_detections$sensor_value),
     tz = "UTC"
   )
-
-  GLATOS_ATO <- set_det(GLATOS_ATO, det)
 
   # I used to have a 'derive' argument as in some of the original OTN-to-IMOS functions but then I realised it was safer to just
   # automatically try to derive receiver metadata from the extract if no file is supplied.
@@ -63,27 +62,36 @@ glatos_to_ato <- function(glatos_detections, glatos_receivers = "", glatos_workb
     dep <- ato_dep_from_glatos(glatos_detections, type = "extract")
   }
 
-  GLATOS_ATO <- set_dep(GLATOS_ATO, dep)
-
   # Tag information is not part of what's distributed in glatos publications so we can't derive it, but if someone has their workbook handy, we can use that to get tag data.
   if(!is.null(glatos_animals)) {
     tag <- ato_tag_from_glatos_workbook(glatos_animals)
-    GLATOS_ATO <- set_tag(GLATOS_ATO, tag)
     
     #We also need to create observations, which we can do from the glatos_animals information since it records whether or not the tag has been captured and recovered. 
     obs <- ato_obs_from_glatos_workbook(glatos_animals)
-    GLATOS_ATO <- set_obs(GLATOS_ATO, obs)
-  }
-
-  #Finally we can get animal info from either the workbook, if provided, or partially from the detections themselves.
-  if(!is.null(glatos_animals)) {
+    
+    #We can also get animal information from the glatos workbook, so if we have that, then let's do it.
     ani <- ato_ani_from_glatos_workbook(glatos_animals)
+    
+    #If we can do all of those, then we can make and return an appropriately-filled ATO with all of our data.
+    GLATOS_ATO <- init_ato(
+      det = det,
+      dep = dep,
+      ani = ani,
+      tag = tag,
+      obs = obs
+    )
   }
+  
+  #If we don't have the workbook then we will just have to make what animal data we can from the extract and call it a day. Tag and Obs
+  #Won't get created and passed in. 
   else {
     ani <- ato_ani_from_glatos(glatos_detections)
+    GLATOS_ATO <- init_ato(
+      det = det,
+      dep = dep,
+      ani = ani
+    )
   }
-
-  GLATOS_ATO <- set_ani(GLATOS_ATO, ani)
 
   return(GLATOS_ATO)
 }
