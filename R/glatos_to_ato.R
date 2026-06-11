@@ -9,7 +9,7 @@
 ##' @param glatos_workbook The path to the XLSX file containing the glatos workbook associated with the detections, if available. 
 ##'
 ##' @importFrom dplyr select '%>%' mutate rename group_by arrange distinct filter left_join
-##' @importFrom tidyr unite
+##' @importFrom tidyr unite drop_na any_of
 ##' @importFrom lubridate ymd as_date
 ##' @importFrom nanoparquet read_parquet
 ##'

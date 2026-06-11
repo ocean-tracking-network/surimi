@@ -4,16 +4,20 @@
 \alias{glatos_to_ato}
 \title{Convert GLATOS detection data to an ATO object.}
 \usage{
-glatos_to_ato(glatos_detections, glatos_receivers = "")
+glatos_to_ato(glatos_detections, glatos_receivers = "", glatos_workbook = "")
 }
 \arguments{
 \item{glatos_detections}{The dataframe containing detection information.}
 
 \item{glatos_receivers}{The dataframe containing receiver information.}
+
+\item{glatos_workbook}{The path to the XLSX file containing the glatos workbook associated with the detections, if available.}
 }
 \value{
 Returns an ATO object.
 }
 \description{
-Takes a GLATOS detection sheet and optionally receiver metadata and returns an ATO object.
+Takes a GLATOS detection sheet and optionally receiver metadata and a glatos workbook and returns an ATO object. The original plan was to have the workbook be loadable as a separate object but I ran
+into problems loading it on its own without any detection data so I'm adding it here. The standalone functions may need to exist either way but I figure if we can build this function out such that it loads as
+much as possible, I'm OK with that.
 }
