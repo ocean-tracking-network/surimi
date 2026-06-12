@@ -33,8 +33,6 @@ rollup <- function(detection_extract, remora_output, style="new") {
       ends_with("_QC")
     )
   
-  View(remora_to_merge)
-  
   # Get the dates into the same format for comparison.
   if(style == "old"){
     otn_dets <- otn_dets %>%
