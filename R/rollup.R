@@ -7,6 +7,7 @@
 #'
 #' @param detection_extract Path to an OTN detection extract corresponding to the remora output in the second parameter.
 #' @param remora_output Path to Remora's QC output corresponding to the OTN detection extract in the first parameter.
+#' @param style Whether this is a 'new' file (parquet or CSV with updated columns) or 'old' (CSV from before we renamed all our columns)
 #'
 #' @return The OTN detection extract, but with the remora QC attached as appropriate.
 #'
@@ -17,11 +18,11 @@
 #'
 #
 
-rollup <- function(detection_extract, remora_output) {
+rollup <- function(detection_extract, remora_output, style="new") {
   # Read in the two dataframes.
-  otn_dets <- read.csv(detection_extract)
+  otn_dets <- load_file(detection_extract)
   remora_out <- read.csv(remora_output)
-
+  
   # Select the appropriate columns from remora_output.
   remora_to_merge <- remora_out %>%
     dplyr::select(
@@ -31,30 +32,54 @@ rollup <- function(detection_extract, remora_output) {
       receiver_id,
       ends_with("_QC")
     )
-
+  
   # Get the dates into the same format for comparison.
-  otn_dets <- otn_dets %>%
-    mutate(
-      datecollected = ymd_hms(datecollected)
-    )
-
+  if(style == "old"){
+    otn_dets <- otn_dets %>%
+      mutate(
+        datecollected = ymd_hms(datecollected)
+      )
+  }
+  
+  else {
+    otn_dets <- otn_dets %>%
+      mutate(
+        dateCollectedUTC = ymd_hms(dateCollectedUTC)
+      )
+  }
+  
   remora_to_merge <- remora_to_merge %>%
     mutate(
       detection_datetime = ymd_hms(detection_datetime)
     )
-
+  
   # Join them to otn_dets
-  otn_det_output <- left_join(
-    otn_dets,
-    remora_to_merge,
-    by = join_by(
-      tagname == transmitter_id,
-      catalognumber == tag_id,
-      datecollected == detection_datetime,
-      receiver == receiver_id
+  if(style == "old") {
+    otn_det_output <- left_join(
+      otn_dets,
+      remora_to_merge,
+      by = join_by(
+        tagname == transmitter_id,
+        catalognumber == tag_id,
+        datecollected == detection_datetime,
+        receiver == receiver_id
+      )
     )
-  )
-
+  }
+  
+  else {
+    otn_det_output <- left_join(
+      otn_dets,
+      remora_to_merge,
+      by = join_by(
+        tagName == transmitter_id,
+        catalogNumber == tag_id,
+        dateCollectedUTC == detection_datetime,
+        receiver == receiver_id
+      )
+    )
+  }
+  
   # Return the merged columns.
   return(otn_det_output)
 }
