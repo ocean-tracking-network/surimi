@@ -7,7 +7,6 @@
 #'
 #' @param detection_extract Path to an OTN detection extract corresponding to the remora output in the second parameter.
 #' @param remora_output Path to Remora's QC output corresponding to the OTN detection extract in the first parameter.
-#' @param style Whether this is a 'new' file (parquet or CSV with updated columns) or 'old' (CSV from before we renamed all our columns)
 #'
 #' @return The OTN detection extract, but with the remora QC attached as appropriate.
 #'
@@ -33,25 +32,32 @@ rollup <- function(detection_extract, remora_output, style="new") {
       ends_with("_QC")
     )
   
+  
   # Get the dates into the same format for comparison.
   if(style == "old"){
     otn_dets <- otn_dets %>%
       mutate(
-        datecollected = ymd_hms(datecollected)
+        datecollected = ymd_hms(datecollected),
+        receiver = as.character(receiver)
       )
   }
   
   else {
     otn_dets <- otn_dets %>%
       mutate(
-        dateCollectedUTC = ymd_hms(dateCollectedUTC)
+        dateCollectedUTC = ymd_hms(dateCollectedUTC),
+        receiver = as.character(receiver)
       )
   }
   
   remora_to_merge <- remora_to_merge %>%
     mutate(
-      detection_datetime = ymd_hms(detection_datetime)
+      detection_datetime = ymd_hms(detection_datetime),
+      receiver_id = as.character(receiver_id)
     )
+  
+  View(otn_dets)
+  View(remora_to_merge)
   
   # Join them to otn_dets
   if(style == "old") {
