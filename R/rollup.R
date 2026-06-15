@@ -7,6 +7,7 @@
 #'
 #' @param detection_extract Path to an OTN detection extract corresponding to the remora output in the second parameter.
 #' @param remora_output Path to Remora's QC output corresponding to the OTN detection extract in the first parameter.
+#' @param style Whether this is a 'new' file (parquet or CSV with updated columns) or 'old' (CSV from before we renamed all our columns)
 #'
 #' @return The OTN detection extract, but with the remora QC attached as appropriate.
 #'
@@ -31,7 +32,6 @@ rollup <- function(detection_extract, remora_output, style="new") {
       receiver_id,
       ends_with("_QC")
     )
-  
   
   # Get the dates into the same format for comparison.
   if(style == "old"){
