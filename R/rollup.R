@@ -56,9 +56,6 @@ rollup <- function(detection_extract, remora_output, style="new") {
       receiver_id = as.character(receiver_id)
     )
   
-  View(otn_dets)
-  View(remora_to_merge)
-  
   # Join them to otn_dets
   if(style == "old") {
     otn_det_output <- left_join(
