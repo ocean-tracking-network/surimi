@@ -37,20 +37,23 @@ rollup <- function(detection_extract, remora_output, style="new") {
   if(style == "old"){
     otn_dets <- otn_dets %>%
       mutate(
-        datecollected = ymd_hms(datecollected)
+        datecollected = ymd_hms(datecollected),
+        receiver = as.character(receiver)
       )
   }
   
   else {
     otn_dets <- otn_dets %>%
       mutate(
-        dateCollectedUTC = ymd_hms(dateCollectedUTC)
+        dateCollectedUTC = ymd_hms(dateCollectedUTC),
+        receiver = as.character(receiver)
       )
   }
   
   remora_to_merge <- remora_to_merge %>%
     mutate(
-      detection_datetime = ymd_hms(detection_datetime)
+      detection_datetime = ymd_hms(detection_datetime),
+      receiver_id = as.character(receiver_id)
     )
   
   # Join them to otn_dets
