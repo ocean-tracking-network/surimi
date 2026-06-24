@@ -1,6 +1,6 @@
 Package: surimi
 Title: Convert Acoustic Telemetry Data Between Institutional Formats
-Version: 0.0.0.1
+Version: 1.0.0.0
 Authors@R: 
     c(person(given="Bruce", 
           family="Delo",

@@ -420,8 +420,8 @@ derive_rcvr_from_new_style_det <- function(det_dataframe) {
 derive_tag_from_new_style_det <- function(det_dataframe, tagname_column = "tagName") {
   # Group by tagname.
   distinctTag <- det_dataframe %>%
-    group_by(across(tagname_column)) %>%
-    distinct(across(tagname_column), .keep_all = TRUE)
+    group_by(across(all_of(tagname_column))) %>%
+    distinct(across(all_of(tagname_column)), .keep_all = TRUE)
   
   # To get the correct transmitter lat/lon, we need to get the releases.
   releases <- det_dataframe %>%
