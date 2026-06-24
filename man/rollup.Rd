@@ -4,12 +4,20 @@
 \alias{rollup}
 \title{Join output from Remora back onto its OTN detection extract.}
 \usage{
-rollup(detection_extract, remora_output)
+rollup(
+  detection_extract,
+  remora_output,
+  style = "new",
+  write = FALSE,
+  path = NULL
+)
 }
 \arguments{
 \item{detection_extract}{Path to an OTN detection extract corresponding to the remora output in the second parameter.}
 
 \item{remora_output}{Path to Remora's QC output corresponding to the OTN detection extract in the first parameter.}
+
+\item{style}{Whether this is a 'new' file (parquet or CSV with updated columns) or 'old' (CSV from before we renamed all our columns)}
 }
 \value{
 The OTN detection extract, but with the remora QC attached as appropriate.
