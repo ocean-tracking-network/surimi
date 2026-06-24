@@ -14,11 +14,12 @@
 #' @importFrom dplyr '%>%' mutate rename left_join
 #' @importFrom tidyr unite separate
 #' @importFrom lubridate ymd_hms
+#' @importFrom nanoparquet write_parquet
 #' @export
 #'
 #
 
-rollup <- function(detection_extract, remora_output, style="new") {
+rollup <- function(detection_extract, remora_output, style="new", write=FALSE, path=NULL) {
   # Read in the two dataframes.
   otn_dets <- load_file(detection_extract)
   remora_out <- read.csv(remora_output)
@@ -83,6 +84,27 @@ rollup <- function(detection_extract, remora_output, style="new") {
     )
   }
   
-  # Return the merged columns.
+  #If the write argument is true, then we will want to write the output to a file.
+  if(write == TRUE){
+    #If path is NULL, we need to supply something of our own.
+    if(is.null(path)) {
+      #We'll use parquet as our default.
+      path = paste0("./rolled_output.parquet")
+    }
+    #We'll now grab the extension from path...
+    extension <- tools::file_ext(path)
+    #... and use that to determine which function to invoke for writing.
+    if(extension == "parquet") {
+      write_parquet(otn_det_output, path, compresion=c("snappy"))
+    }
+    else if (extension == "csv"){
+      write.csv(otn_det_output, path)
+    }
+    else {
+      message(paste0("File extension ", extension, " is invalid. Please supply a path with either a .parquet or .csv extension if you want rollup to automatically write the output."))
+    }
+  }
+  
+  # Return the merged columns either way, so that the user has them as a dataframe to work with.
   return(otn_det_output)
 }
