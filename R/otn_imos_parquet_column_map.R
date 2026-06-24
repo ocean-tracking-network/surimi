@@ -138,6 +138,20 @@ otn_imos_new_style_column_map <- function(det_dataframe, rcvr_dataframe = NULL, 
   # If we have receiver_meta, convert that to an IMOS friendly version.
   if (!is.null(rcvr_dataframe) && !derive) {
     rcvr_return <- rcvr_dataframe %>%
+      rename(
+        "DEPLOY_DATE_TIME" = "DEPLOY_DATE_TIME   (yyyy-mm-ddThh:mm:ss)",
+        "DEPLOYED_BY" = "DEPLOYED_BY (Lead Technicians)",
+        "RECOVERED" = "RECOVERED (Y/N/l)",
+        "RECOVER_DATE_TIME" = "RECOVER_DATE_TIME (yyyy-mm-ddThh:mm:ss)",
+        "RECOVER_LAT" = "RECOVER_LAT (dd.ddddd)",
+        "RECOVER_LONG" = "RECOVER_LONG (ddd.ddddd)",
+        "DATA_DOWNLOADED" = "DATA_DOWNLOADED (Y/N)",
+        "DOWNLOAD_DATE_TIME" = "DOWNLOAD_DATE_TIME (yyyy-mm-ddThh:mm:ss)",
+        "INS_MODEL_NUMBER" = "INS_MODEL_NO",
+        "INS_SERIAL_NUMBER" = "INS_SERIAL_NO",
+        "AR_MODEL_NUMBER" = "AR_MODEL_NO",
+        "AR_SERIAL_NUMBER" = "AR_SERIAL_NO"
+      ) %>%
       dplyr::select(
         OTN_ARRAY,
         STATION_NO,
